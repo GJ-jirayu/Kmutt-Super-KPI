@@ -69,7 +69,40 @@ public class EduqaServiceJpaImpl  implements EduqaService {
 		return  repository.searchKpiLevel(persistentInstance,pagging,keySearch);
 	}
 	
+	
+	//#####[ START: Kpi Perspective ]##############################################################################//
+	@Override
+	public Integer saveKpiPerspective(KpiPerspective transientInstance)
+			throws DataAccessException{
+		return  repository.saveKpiPerspective(transientInstance);
+	}
+	
+	@Override
+	public Integer updateKpiPerspective(KpiPerspective transientInstance)
+			throws DataAccessException{
+		return  repository.updateKpiPerspective(transientInstance);
+	}
+	
+	@Override
+	public Integer deleteKpiPerspective(KpiPerspective persistentInstance)
+			throws DataAccessException{
+		return  repository.deleteKpiPerspective(persistentInstance);
+	}	
+	
+	@Override
+	public KpiPerspective findKpiPerspectiveById(Integer KpiLevelId)
+			throws DataAccessException{
+		return  repository.findKpiPerspectiveById(KpiLevelId);
+	}
+	
+	@Override
+	public List searchKpiPerspective(KpiPerspective persistentInstance,Paging pagging,String keySearch)
+			throws DataAccessException{
+		return  repository.searchKpiPerspective(persistentInstance,pagging,keySearch);
+	}
+	//#####[ END: Kpi Perspective ]##############################################################################//
 
+	
 	//#####[ START: Kpi Group ]##############################################################################//
 		@Override
 		public Integer saveKpiGroup(KpiGroup transientInstance)

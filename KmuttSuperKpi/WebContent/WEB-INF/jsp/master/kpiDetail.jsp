@@ -1,6 +1,6 @@
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 <%@ page contentType="text/html; charset=utf-8" %> 
-<%@page import="javax.portlet.PortletURL"%>
+<%@ page import="javax.portlet.PortletURL"%>
 
 <portlet:actionURL var="formActionInsert">
 	<portlet:param name="action" value="doInsertKpi"/>
@@ -229,6 +229,22 @@
 			}
 		}
 
+		function verifyDataOnSubmit(){
+			var collection = $(".Required");
+			var data1 = collection.get();
+			var elCount = 0;
+			$.each(data1,function(index,indexEntry){
+				if($(indexEntry).val() == "" || $(indexEntry).val() == null){
+					$(indexEntry).css({"border-color": "#e9322d", "box-shadow": "0 0 6px #f8b9b7"}); 					
+					elCount++;
+					$(indexEntry).focus();
+				}else{
+					$(indexEntry).css({"border-color": "", "box-shadow": ""}); 				}
+				
+			});
+
+			if(elCount == 0){ doSubmitDetail(); }else{ alert("กรุณากรอกข้อมูลให้ครบถ้วน!!");}
+		}
 
     	function doSubmitDetail(){
     		var baseCriteriaType = $("#criteriaTypeStr").val();
@@ -1398,26 +1414,54 @@
 		   	<form:form  id="kpiFormDetail" modelAttribute="kpiForm" method="post"  name="kpiForm" action="${formActionNew}" enctype="multipart/form-data">
 			<form:input type="text" id="kpiId" path="kpiModel.kpiId" style="display:none"/>
 			<table class="tableKpiDetail">
-				<tr><td colspan="2"><label>ชื่อตัวบ่งชี้</label><form:textarea id="detailKpiName" style="width:80%;" path="kpiModel.kpiName" rows="2" />
+				<tr>
+					<td colspan="2"> 
+						<label> รหัสตัวบ่งชี้</label>
+						<form:input type="text" id="detailKpiCode" class="Required" path="kpiModel.kpiCode"/> 
+					</td>
 				</tr>
-				<tr><td><label>ระดับตัวบ่งชี้</label><form:select id="detailLevel"  path="kpiModel.levelId" items="${levelList}" /></td>
+				<tr>
+					<td colspan="2"><label>ชื่อตัวบ่งชี้</label>
+						<form:textarea id="detailKpiName" path="kpiModel.kpiName" class="Required" 
+						style="width: 75%" rows="3"/>
+					</td>
+				</tr>
+				<tr>
+					<td><label>ระดับตัวบ่งชี้</label><form:select id="detailLevel"  path="kpiModel.levelId" 
+					items="${levelList}" class="Required"/></td>
 					<td><label>องค์ประกอบ</label> <form:select id="detailStructure"  path="kpiModel.structureId" items="${structureList}" /></td>
 				</tr>
-				<tr><td><label>กลุ่มตัวบ่งชี้</label><form:select id="detailGroup"  path="kpiModel.groupId" items="${groupList}" /></td>
-					<td><label>ชนิดตัวบ่งชี้</label><form:select id="detailType" path="kpiModel.typeId" items="${typeList}" /></td>
+				<tr>
+					<td><label>กลุ่มตัวบ่งชี้</label><form:select id="detailGroup"  path="kpiModel.groupId" 
+					items="${groupList}" class="Required"/></td>
+					<td><label>ชนิดตัวบ่งชี้</label><form:select id="detailType" path="kpiModel.typeId" 
+					items="${typeList}" class="Required"/></td>
 				</tr>
-				<tr><td><label>ประเภทปฏิทิน</label><form:select id="detailCalendarType"  path="kpiModel.calendarTypeId" items="${calendarTypeList}" /></td>
-					<td> <label>ช่วงเวลา </label> <form:select id="detailPeriod"  path="kpiModel.periodId" items="${periodList}" /> </td>
+				<tr>
+					<td colspan="2"> 
+						<label> มุมมองตัวบ่งชี้</label>
+						<form:select id="detailPerspective" path="kpiModel.kpiPerspectiveId" 
+						items="${kpiPerspectiveList}" class="Required"/>
+					</td>
 				</tr>
-				<tr><td><label>หน่วยวัด </label><form:select id="detailUom" path="kpiModel.uomId" items="${uomList}" /></td>	
+				<tr>
+					<td><label>ประเภทปฏิทิน</label><form:select id="detailCalendarType"  path="kpiModel.calendarTypeId" items="${calendarTypeList}" /></td>
+					<td> <label>ช่วงเวลา </label> <form:select id="detailPeriod"  path="kpiModel.periodId" 
+					items="${periodList}" class="Required"/> </td>
+				</tr>
+				<tr>
+					<td><label>หน่วยวัด </label><form:select id="detailUom" path="kpiModel.uomId" 
+					items="${uomList}" class="Required"/></td>	
 					<td><label>ภายใต้ตัวบ่งชี้</label> <form:select id="detailParent"  path="kpiModel.parentId" items="${ parentList}" />
 					<img height="24" width="24" style="cursor: pointer" src="<c:url value="/resources/images/refresh-rect-bw.png"/>" onclick="getKpiParentList()" />
 					<img height="24" width="24" style="display:none;" src="<c:url value="/resources/images/loading_blue_32.gif"/>" />
 				</tr>
-				<tr><td> <label>ค่าเปรียบเทียบ</label> <form:input type="text" class="numbersOnly" id="detailBenchmark" path="kpiModel.benchmark" /> (ตามหน่วยวัด)</td>
+				<tr>
+					<td> <label>ค่าเปรียบเทียบ</label> <form:input type="text" class="numbersOnly" id="detailBenchmark" path="kpiModel.benchmark" /> (ตามหน่วยวัด)</td>
 					<td> <label>ค่าคะแนนต่ำสุด</label> <form:input type="text" class="numbersOnly" id="detailMinScore" path="kpiModel.minScore" style="width:30px" /></td>
 				</tr>				
 			</table>
+
 			<table class="tableKpiCriteria"> 
 				<tr><td><label>ประเภทเกณฑ์ประเมิน</label> <form:select id="criteriaTypeId" onchange="criteriaTypeChange()" path="kpiModel.criteriaTypeId" items="${criteriaTypeList}" /></td>
 				</tr>
@@ -1430,7 +1474,7 @@
 				<tr style="display:none;"> <td> <form:input type="text" path="kpiModel.createdBy" /> </td> </tr>
 				<tr style="display:none;"> <td> <form:input type="text" path="kpiModel.createdDate" /> </td> </tr>
 			</table>			
-			<div style="text-align:center;"><input onClick="doSubmitDetail()" type="button" class="save" value="บันทึก" style="{margin-right:10px;}" /> <input type="button" class="cancel" onClick="doBack2List()" value="ยกเลิก" /> 
+			<div style="text-align:center;"><input onClick="verifyDataOnSubmit()" type="button" class="save" value="บันทึก" style="{margin-right:10px;}" /> <input type="button" class="cancel" onClick="doBack2List()" value="ยกเลิก" /> 
 			</div>
 			</form:form>
 		</div> <!--  end detail box --> 

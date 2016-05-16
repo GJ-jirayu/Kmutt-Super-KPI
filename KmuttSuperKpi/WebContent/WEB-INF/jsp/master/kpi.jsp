@@ -146,8 +146,8 @@
 		       		<table  class="datagrid tableGridLv hoverTable">
 		       			<thead>
 		       				<tr>
-		       					<th>รหัสตัวบ่งชี้</th>
-			       				<th>กลุ่มตัวบ่งชี้</th>
+		       					<th>ไอดีตัวบ่งชี้</th>
+			       				<th>รหัสตัวบ่งชี้</th>
 			       				<th>ชื่อตัวบ่งชี้</th>
 			       				<th>ประเภทเกณฑ์การประเมิน</th>
 			       				<th>ชนิดตัวบ่งชี้</th>
@@ -159,10 +159,10 @@
 		       				<c:forEach items="${accordion.kpis}" var="kpi" varStatus="loop"> 
 		                	<tr> 
 		                		<td>${kpi.kpiId}</td>
-		                		<td>${chandraFn:nl2br(kpi.groupName)}</td>  
+		                		<td>${chandraFn:nl2br(kpi.kpiCode)}</td>  
 			               	 	<td>${chandraFn:nl2br(kpi.kpiName)}</td>  
 			               	 	<td>${chandraFn:nl2br(kpi.criteriaTypeName)}</td> 
-			               	 	<td>${chandraFn:nl2br(kpi.typeName)}</td>  
+			               	 	<td>${chandraFn:nl2br(kpi.typeName)}</td> 
 			                	<td style="text-align: center;">
 			                		<img height="24" width="24"  onClick="actEdit(this)"  src="<c:url value="/resources/images/edited.png"/>">
 		       					</td>	

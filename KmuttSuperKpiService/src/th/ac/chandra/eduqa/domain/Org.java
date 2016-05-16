@@ -70,6 +70,9 @@ public class Org implements Serializable {
 	
 	@Column(name="UPDATED_DTTM")
 	private Timestamp updatedDate;
+	
+	@Column(name="OWNER_IMAGE_PATH")
+    private String ownerImagePath;
 
 	
 	public Integer getOrgId() {
@@ -214,6 +217,14 @@ public class Org implements Serializable {
 
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	public String getOwnerImagePath() {
+		return ownerImagePath;
+	}
+
+	public void setOwnerImagePath(String ownerImagePath) {
+		this.ownerImagePath = ownerImagePath;
 	}
 	
 }

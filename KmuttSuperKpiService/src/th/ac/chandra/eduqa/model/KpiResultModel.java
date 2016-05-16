@@ -49,6 +49,16 @@ public class KpiResultModel extends ImakeXML implements Serializable{
 	private List<Integer> kpiIds;
 	private String hasResult;
 	private Integer active;
+    private String kpiCode;
+    private Integer kpiPerspectiveId;
+    private String kpiPerspectiveName;
+    private Double kpiWeight;
+    private Double percentWavg;
+    private Integer parentKpiId;
+    private String hasChild;
+    private Integer calendarMonthNo;
+    private Integer academicMonthNo;
+    private Integer fiscalMonthNo;
 	
 	public KpiResultModel() {
 	}
@@ -355,6 +365,86 @@ public class KpiResultModel extends ImakeXML implements Serializable{
 
 	public void setActive(Integer active) {
 		this.active = active;
+	}
+
+	public String getKpiCode() {
+		return kpiCode;
+	}
+
+	public void setKpiCode(String kpiCode) {
+		this.kpiCode = kpiCode;
+	}
+
+	public Integer getKpiPerspectiveId() {
+		return kpiPerspectiveId;
+	}
+
+	public void setKpiPerspectiveId(Integer kpiPerspectiveId) {
+		this.kpiPerspectiveId = kpiPerspectiveId;
+	}
+
+	public String getKpiPerspectiveName() {
+		return kpiPerspectiveName;
+	}
+
+	public void setKpiPerspectiveName(String kpiPerspectiveName) {
+		this.kpiPerspectiveName = kpiPerspectiveName;
+	}
+
+	public Double getKpiWeight() {
+		return kpiWeight;
+	}
+
+	public void setKpiWeight(Double kpiWeight) {
+		this.kpiWeight = kpiWeight;
+	}
+
+	public Double getPercentWavg() {
+		return percentWavg;
+	}
+
+	public void setPercentWavg(Double percentWavg) {
+		this.percentWavg = percentWavg;
+	}
+
+	public Integer getParentKpiId() {
+		return parentKpiId;
+	}
+
+	public void setParentKpiId(Integer parentKpiId) {
+		this.parentKpiId = parentKpiId;
+	}
+
+	public String getHasChild() {
+		return hasChild;
+	}
+
+	public void setHasChild(String hasChild) {
+		this.hasChild = hasChild;
+	}
+
+	public Integer getCalendarMonthNo() {
+		return calendarMonthNo;
+	}
+
+	public void setCalendarMonthNo(Integer calendarMonthNo) {
+		this.calendarMonthNo = calendarMonthNo;
+	}
+
+	public Integer getAcademicMonthNo() {
+		return academicMonthNo;
+	}
+
+	public void setAcademicMonthNo(Integer academicMonthNo) {
+		this.academicMonthNo = academicMonthNo;
+	}
+
+	public Integer getFiscalMonthNo() {
+		return fiscalMonthNo;
+	}
+
+	public void setFiscalMonthNo(Integer fiscalMonthNo) {
+		this.fiscalMonthNo = fiscalMonthNo;
 	}
 	
 }

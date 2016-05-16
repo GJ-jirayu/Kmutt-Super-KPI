@@ -16,6 +16,14 @@ public interface EduqaService {
 	@SuppressWarnings("rawtypes")
 	public  List searchKpiLevel(KpiLevel persistentInstance,Paging pagging,String keySearch)throws DataAccessException  ;
 	
+	//KPI Perspective
+	public Integer saveKpiPerspective(KpiPerspective transientInstance) throws DataAccessException;
+	public Integer updateKpiPerspective(KpiPerspective transientInstance) throws DataAccessException ;
+	public Integer deleteKpiPerspective(KpiPerspective persistentInstance) throws DataAccessException ;	
+	public KpiPerspective findKpiPerspectiveById(Integer KpiLevelId)throws DataAccessException  ;
+	@SuppressWarnings("rawtypes")
+	public  List searchKpiPerspective(KpiPerspective persistentInstance,Paging pagging,String keySearch)throws DataAccessException  ;
+	
 	//KPI Group
 		public Integer saveKpiGroup(KpiGroup transientInstance) throws DataAccessException;
 		public Integer updateKpiGroup(KpiGroup transientInstance) throws DataAccessException;

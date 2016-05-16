@@ -44,6 +44,9 @@ public class KpiModel extends ImakeXML implements Serializable{
 	private String calendarTypeName;
 	private String periodName;
 	private String uomName;
+    private String kpiCode;
+    private Integer kpiPerspectiveId;
+    private String kpiPerspectiveName;
 
 	public KpiModel() {
 	}
@@ -265,5 +268,29 @@ public class KpiModel extends ImakeXML implements Serializable{
 
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
+	}
+
+	public String getKpiCode() {
+		return kpiCode;
+	}
+
+	public void setKpiCode(String kpiCode) {
+		this.kpiCode = kpiCode;
+	}
+
+	public Integer getKpiPerspectiveId() {
+		return kpiPerspectiveId;
+	}
+
+	public void setKpiPerspectiveId(Integer kpiPerspectiveId) {
+		this.kpiPerspectiveId = kpiPerspectiveId;
+	}
+
+	public String getKpiPerspectiveName() {
+		return kpiPerspectiveName;
+	}
+
+	public void setKpiPerspectiveName(String kpiPerspectiveName) {
+		this.kpiPerspectiveName = kpiPerspectiveName;
 	}
 }

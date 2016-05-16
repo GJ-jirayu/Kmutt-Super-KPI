@@ -30,23 +30,33 @@ import org.springframework.web.portlet.bind.PortletRequestDataBinder;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
-import th.ac.chandra.eduqa.domain.CriteriaStandard;
-import th.ac.chandra.eduqa.form.CdsForm;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.User;
+import com.liferay.portal.util.PortalUtil;
+
 import th.ac.chandra.eduqa.form.KpiForm;
 import th.ac.chandra.eduqa.form.KpiListForm;
 import th.ac.chandra.eduqa.mapper.CustomObjectMapper;
 import th.ac.chandra.eduqa.mapper.ResultService;
-import th.ac.chandra.eduqa.model.*;
+import th.ac.chandra.eduqa.model.BaselineModel;
+import th.ac.chandra.eduqa.model.CdsModel;
+import th.ac.chandra.eduqa.model.CriteriaGroupModel;
+import th.ac.chandra.eduqa.model.CriteriaModel;
+import th.ac.chandra.eduqa.model.DescriptionModel;
+import th.ac.chandra.eduqa.model.KpiGroupModel;
+import th.ac.chandra.eduqa.model.KpiLevelModel;
+import th.ac.chandra.eduqa.model.KpiModel;
+import th.ac.chandra.eduqa.model.KpiPerspectiveModel;
+import th.ac.chandra.eduqa.model.KpiResultModel;
+import th.ac.chandra.eduqa.model.KpiStrucModel;
+import th.ac.chandra.eduqa.model.KpiTypeModel;
+import th.ac.chandra.eduqa.model.KpiUomModel;
+import th.ac.chandra.eduqa.model.SysYearModel;
 import th.ac.chandra.eduqa.service.EduqaService;
 import th.ac.chandra.eduqa.xstream.common.Paging;
-
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.model.User;
-import com.liferay.portal.util.PortalUtil;
 
 @Controller("kpiController")
 @RequestMapping("VIEW")
@@ -66,21 +76,11 @@ public class KpiController {
 			return 9999;
 		}
 	}
-	
-	@Autowired
-	private CustomObjectMapper customObjectMapper;
 
-	private String msg = "start";
 	@InitBinder
 	public void initBinder(PortletRequestDataBinder binder, PortletPreferences preferences) {
 		logger.debug("initBinder");
-		binder.registerCustomEditor(byte[].class, new ByteArrayMultipartFileEditor());
-/*
-		final String[] ALLOWED_FIELDS={"researchGroupM.researchGroupId","researchGroupM.createdBy","researchGroupM.createdDate",
-				"researchGroupM.groupCode","researchGroupM.permissions","researchGroupM.updatedBy",
-				"researchGroupM.updatedDate","researchGroupM.groupTh","researchGroupM.groupEng","mode", "command","keySearch"};
-			*/
-		//	binder.setAllowedFields(ALLOWED_FIELDS);		
+		binder.registerCustomEditor(byte[].class, new ByteArrayMultipartFileEditor());	
 	}
 	@RequestMapping("VIEW") 
 	public String listRows(PortletRequest request,Model model){
@@ -127,6 +127,8 @@ public class KpiController {
 		response.setRenderParameter("render", "showDetail");
 		response.setRenderParameter("kpiId",String.valueOf( kpiListForm.getKpiId()) );
 	}
+	
+	
 	@RequestMapping("VIEW")
 	@RenderMapping(params="render=showDetail")
 	public String showDetail(PortletRequest request,Model model){
@@ -202,8 +204,6 @@ public class KpiController {
 		for(DescriptionModel crType: crTypes){
 			criteriaTypeList.put(crType.getDescCode(),crType.getDescription());
 		}
-		//	criteriaTypeList.put(1, "เชิงปริมาณ");
-		//	criteriaTypeList.put(2, "เชิงคุณภาพ");
 		model.addAttribute("criteriaTypeList", criteriaTypeList);
 		
 		Map<String,String> criteriaMethodList = new HashMap<String,String>();
@@ -211,11 +211,8 @@ public class KpiController {
 		for(DescriptionModel crMethod: crMthods){
 			criteriaMethodList.put(crMethod.getDescCode(),crMethod.getDescription());
 		}
-		//criteriaMethodList.put(1,"แปลงค่าจากสูตร");
-		//criteriaMethodList.put(2,"ใช้ผลลัพท์จากสูตร");
-		//criteriaMethodList.put(3,"เกณฑ์มาตราฐาน");
-		//criteriaMethodList.put(4,"เกณฑ์มาตราฐานแยกข้อ");
 		model.addAttribute("criteriaMethodList",criteriaMethodList);
+		
 		// criteria group
 		Map<Integer,String> criteriaGroupList = new HashMap<Integer,String>();
 		List<CriteriaGroupModel> criteriaGroups = service.searchCriteriaGroup(new CriteriaGroupModel());
@@ -228,6 +225,19 @@ public class KpiController {
 		// maunal map with key all 
 		criteriaGroupDetailList.put(1,"รวม");
 		model.addAttribute("criteriaGroupDetailList", criteriaGroupDetailList);
+		
+		// kpi_perspective
+		Map<Integer,String> kpiPerspectiveList = new HashMap<Integer,String>();
+		List<KpiPerspectiveModel> kpiPerspective = service.searchKpiPerspective(new KpiPerspectiveModel());
+		if(kpiPerspective != null || !kpiPerspective.isEmpty()){
+			for(KpiPerspectiveModel perspective: kpiPerspective){
+				kpiPerspectiveList.put(perspective.getPerspcId(),perspective.getPerspcName());
+			}
+		}else{
+			kpiPerspectiveList.put(0, "Data not found");
+		}		
+		model.addAttribute("kpiPerspectiveList", kpiPerspectiveList);
+		
 		//kpiForm
 		KpiForm kpiForm=null;
 		if (!model.containsAttribute("kpiForm")) {
@@ -259,6 +269,7 @@ public class KpiController {
 		}
 		return "master/kpiDetail";
 	}
+	
 	
 	@RequestMapping(params = "action=doDelete")
 	public void actionDelete(javax.portlet.ActionRequest request, javax.portlet.ActionResponse response,

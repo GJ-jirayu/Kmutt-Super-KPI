@@ -13,6 +13,12 @@
 							bean="kpiLevelResource" />
 					</bean>
 				</entry>
+				<entry key="/kpiPerspectiveModel">
+					<bean class="org.restlet.ext.spring.SpringFinder">
+						<lookup-method name="create"
+							bean="kpiPerspectiveResource" />
+					</bean>
+				</entry>
 				<entry key="/kpiGroupModel">
 					<bean class="org.restlet.ext.spring.SpringFinder">
 						<lookup-method name="create"

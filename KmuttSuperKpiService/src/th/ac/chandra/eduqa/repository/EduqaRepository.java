@@ -42,6 +42,7 @@ import th.ac.chandra.eduqa.domain.KpiEvidence;
 import th.ac.chandra.eduqa.domain.KpiGroup;
 import th.ac.chandra.eduqa.domain.KpiGroupType;
 import th.ac.chandra.eduqa.domain.KpiLevel;
+import th.ac.chandra.eduqa.domain.KpiPerspective;
 import th.ac.chandra.eduqa.domain.KpiReComnd;
 import th.ac.chandra.eduqa.domain.KpiResult;
 import th.ac.chandra.eduqa.domain.KpiResultDetail;
@@ -153,6 +154,59 @@ public class EduqaRepository   {
 		return transList;
 	}
 
+	
+	//#####[ START: Kpi Perspective ]###########################################################################//
+	public Integer saveKpiPerspective(KpiPerspective transientInstance) throws DataAccessException {
+        String qryStr = "SELECT k FROM KpiPerspective k WHERE k.perspcName ='" + transientInstance.getPerspcName() + "'";
+        List query = this.entityManager.createQuery(qryStr).getResultList();
+        if (query.isEmpty()) {
+            this.entityManager.persist((Object)transientInstance);
+            return 1;
+        }
+        return 0;
+    }
+
+    public Integer updateKpiPerspective(KpiPerspective transientInstance) throws DataAccessException {
+        Integer status = 0;
+        String qryStr = "SELECT k FROM KpiPerspective k WHERE k.perspcName = '" + transientInstance.getPerspcName() + "' " + " AND k.perspcId != " + transientInstance.getPerspcId();
+        List query = this.entityManager.createQuery(qryStr).getResultList();
+        if (query.isEmpty()) {
+            this.entityManager.merge((Object)transientInstance);
+            status = transientInstance.getPerspcId();
+        } else {
+            status = 0;
+        }
+        return status;
+    }
+
+    public Integer deleteKpiPerspective(KpiPerspective persistentInstance) throws DataAccessException {
+        int deletedCount = this.entityManager.createQuery("delete from KpiPerspective where perspcId = " + persistentInstance.getPerspcId()).executeUpdate();
+        return deletedCount;
+    }
+
+    public KpiPerspective findKpiPerspectiveById(Integer perSpectiveId) throws DataAccessException {
+        return (KpiPerspective)this.entityManager.find((Class)KpiPerspective.class, (Object)perSpectiveId);
+    }
+
+    public List searchKpiPerspective(KpiPerspective persistentInstance, Paging pagging, String keySearch) throws DataAccessException {
+        StringBuffer sb = new StringBuffer("");
+        sb.append(" where p.perspcId > 0 ");
+        if (keySearch != null && keySearch.trim().length() > 0) {
+            sb.append(" and  p.perspcName like '%" + keySearch.trim() + "%' ");
+        }
+        ArrayList<Object> transList = new ArrayList<Object>();
+        Query query = this.entityManager.createQuery(" select p from KpiPerspective p " + sb.toString(), (Class)KpiPerspective.class);
+        query.setFirstResult((pagging.getPageNo() - 1) * pagging.getPageSize());
+        query.setMaxResults(pagging.getPageSize());
+        transList.add(query.getResultList());
+        query = this.entityManager.createQuery("select count(p) from KpiPerspective p " + sb.toString());
+        long count = (Long)query.getSingleResult();
+        transList.add(String.valueOf(count));
+        return transList;
+    }
+	//#####[ END: Kpi Perspective ]###########################################################################//
+	
+	
 	//#####[ START: Kpi Group ]###########################################################################//
 		public Integer saveKpiGroup(KpiGroup transientInstance)
 				throws DataAccessException {
@@ -906,6 +960,9 @@ public class EduqaRepository   {
 		" ,cd.calendar_type_name " +
 		" ,p.period_name"+
 		" ,um.kpi_uom_name "+
+		" ,kpi.kpi_code "+
+		" ,kp.kpi_perspective_id "+
+		" ,kp.kpi_perspective_name "+
 		" from kpi "+
 		" left join kpi_group g on kpi.kpi_group_id = g.kpi_group_id "+
 		" left join kpi_structure s on s.kpi_structure_id = kpi.kpi_structure_id "+
@@ -913,8 +970,9 @@ public class EduqaRepository   {
 		" left join criteria_type ct on ct.criteria_type_id = kpi.criteria_type_id "
 		+ " left join calendar_type cd on kpi.calendar_type_id = cd.calendar_type_id"
 		+ " left join period p on kpi.period_id = p.period_id"
-		+ " left join kpi_uom um on kpi.kpi_uom_id = um.kpi_uom_id "  + sb.toString() + 
-		" order by kpi.kpi_structure_id,kpi.kpi_name ";
+		+ " left join kpi_uom um on kpi.kpi_uom_id = um.kpi_uom_id "  + sb.toString() 
+		+ " left join kpi_perspective kp on kp.kpi_perspective_id = kpi.kpi_perspective_id"
+		+" order by kpi.kpi_structure_id,kpi.kpi_name ";
 		Query query =  entityManager.createNativeQuery(sql);
 		query.setFirstResult((pagging.getPageNo()-1) * pagging.getPageSize()); 
 		query.setMaxResults(pagging.getPageSize());	
@@ -932,6 +990,9 @@ public class EduqaRepository   {
 		    kpi.setCalendarTypeName( (String)result[7]);
 		    kpi.setPeriodName( (String)result[8]);
 		    kpi.setUomName( (String)result[9]);
+		    kpi.setKpiCode((String)result[10]);
+		    kpi.setKpiPerspectiveId((Integer)result[11]);
+		    kpi.setKpiPerspectiveName((String)result[12]);
 		    kpis.add(kpi);
 		}
 		ArrayList transList = new ArrayList();

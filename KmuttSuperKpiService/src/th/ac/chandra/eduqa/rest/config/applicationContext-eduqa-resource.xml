@@ -11,6 +11,12 @@
 		<property name="xstream" ref="xstream"></property>
 	</bean>
 	
+	<bean id="kpiPerspectiveResource"
+		class="th.ac.chandra.eduqa.resource.KpiPerspectiveResource"
+		scope="prototype"> 
+		<property name="xstream" ref="xstream"></property>
+	</bean>
+	
 	<bean id="kpiGroupResource"
 		class="th.ac.chandra.eduqa.resource.KpiGroupResource"
 		scope="prototype"> 

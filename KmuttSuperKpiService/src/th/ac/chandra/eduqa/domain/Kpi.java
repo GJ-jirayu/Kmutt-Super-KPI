@@ -92,6 +92,12 @@ public class Kpi implements Serializable {
 	
 	@Column(name="UPDATED_BY")
 	private String updatedBy;
+	
+	@Column(name="KPI_CODE")
+	private String kpiCode;
+	
+	@Column(name="KPI_PERSPECTIVE_ID")
+	private Integer kpiPerspectiveId;
 
 	
 	public Kpi() {
@@ -284,6 +290,18 @@ public class Kpi implements Serializable {
 	}
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
+	}
+	public String getKpiCode() {
+		return kpiCode;
+	}
+	public void setKpiCode(String kpiCode) {
+		this.kpiCode = kpiCode;
+	}
+	public Integer getKpiPerspectiveId() {
+		return kpiPerspectiveId;
+	}
+	public void setKpiPerspectiveId(Integer kpiPerspectiveId) {
+		this.kpiPerspectiveId = kpiPerspectiveId;
 	}
 
 	

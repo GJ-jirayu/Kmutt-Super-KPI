@@ -24,6 +24,7 @@ public class OrgModel extends ImakeXML implements Serializable{
 	private String UpdatedBy;
 	private Timestamp createdDate;
 	private Timestamp updatedDate;
+    private String ownerImagePath;
 
 	public OrgModel() {
 	}
@@ -154,6 +155,14 @@ public class OrgModel extends ImakeXML implements Serializable{
 
 	public void setCourseName(String courseName) {
 		this.courseName = courseName;
+	}
+
+	public String getOwnerImagePath() {
+		return ownerImagePath;
+	}
+
+	public void setOwnerImagePath(String ownerImagePath) {
+		this.ownerImagePath = ownerImagePath;
 	}
 
 }

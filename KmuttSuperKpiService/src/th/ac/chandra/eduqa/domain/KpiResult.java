@@ -126,6 +126,36 @@ public class KpiResult implements Serializable {
 	@Column(name="ACTIVE")
 	private Integer active;
 	
+	@Column(name="KPI_CODE")
+    private String kpiCode;
+	
+    @Column(name="KPI_PERSPECTIVE_ID")
+    private Integer kpiPerspectiveId;
+    
+    @Column(name="KPI_PERSPECTIVE_NAME")
+    private String kpiPerspectiveName;
+    
+    @Column(name="KPI_WEIGHT")
+    private Double kpiWeight;
+    
+    @Column(name="PERCENT_WAVG")
+    private Double percentWavg;
+    
+    @Column(name="PARENT_KPI_ID")
+    private Integer parentKpiId;
+    
+    @Column(name="HAS_CHILD")
+    private String hasChild;
+    
+    @Column(name="CALENDAR_MONTH_NO")
+    private Integer calendarMonthNo;
+    
+    @Column(name="ACADEMIC_MONTH_NO")
+    private Integer academicMonthNo;
+    
+    @Column(name="FISCAL_MONTH_NO")
+    private Integer fiscalMonthNo;
+	
 	/*//bi-directional many-to-one association to ResearcherGroup
 	@OneToMany(mappedBy="researchGroup")
 	private List<ResearcherGroup> researcherGroups;*/

@@ -33,10 +33,17 @@ public class ServiceConstant {
 	
 	// ## master
 	public static final String LEVEL_SEARCH = "searchLevel";
-	public static final String LEVEL_SAVE= "saveLevel";	
+	public static final String LEVEL_SAVE= "saveLevel";
 	public static final String LEVEL_UPDATE = "updateLevel";
 	public static final String LEVEL_DELETE = "deleteLevel";
 	public static final String LEVEL_FIND_BY_ID = "findLevelById";
+	
+	//KPI Perspective
+	public static final String PERSPECTIVE_FIND_BY_ID = "findPerspectiveById";
+    public static final String PERSPECTIVE_SEARCH = "searchPerspective";
+    public static final String PERSPECTIVE_SAVE = "savePerspective";
+    public static final String PERSPECTIVE_UPDATE = "updatePerspective";
+    public static final String PERSPECTIVE_DELETE = "deletePerspective";
 	
 		//KPI Group
 		public static final String GROUP_SEARCH = "searchGroup";
