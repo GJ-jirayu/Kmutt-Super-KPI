@@ -149,8 +149,8 @@
 		       					<th>ไอดีตัวบ่งชี้</th>
 			       				<th>รหัสตัวบ่งชี้</th>
 			       				<th>ชื่อตัวบ่งชี้</th>
-			       				<th>ประเภทเกณฑ์การประเมิน</th>
-			       				<th>ชนิดตัวบ่งชี้</th>
+			       				<th>องค์ประกอบ</th>
+			       				<th>มุมมอง</th>
 			       				<th>แก้ไข</th>
 			       				<th>ลบ</th>
 		       				</tr>
@@ -161,8 +161,8 @@
 		                		<td>${kpi.kpiId}</td>
 		                		<td>${chandraFn:nl2br(kpi.kpiCode)}</td>  
 			               	 	<td>${chandraFn:nl2br(kpi.kpiName)}</td>  
-			               	 	<td>${chandraFn:nl2br(kpi.criteriaTypeName)}</td> 
-			               	 	<td>${chandraFn:nl2br(kpi.typeName)}</td> 
+			               	 	<td>${chandraFn:nl2br(kpi.structureName)}</td> 
+			               	 	<td>${chandraFn:nl2br(kpi.kpiPerspectiveName)}</td> 
 			                	<td style="text-align: center;">
 			                		<img height="24" width="24"  onClick="actEdit(this)"  src="<c:url value="/resources/images/edited.png"/>">
 		       					</td>	

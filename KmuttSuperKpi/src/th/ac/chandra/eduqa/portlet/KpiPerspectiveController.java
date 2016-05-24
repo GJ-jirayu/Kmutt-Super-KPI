@@ -118,12 +118,13 @@ public class KpiPerspectiveController {
 			@ModelAttribute("kpiPerspectiveForm") KpiPerspectiveForm kpiPerspectiveForm,
 			BindingResult result, Model model) throws ParseException {
 		User user = (User) request.getAttribute(WebKeys.USER);
-		//kpiPerspectiveForm.getKpiPerspectiveModel().setAcademicYear(sy.getMasterAcademicYear());
-		kpiPerspectiveForm.getKpiPerspectiveModel().setUpdatedBy(user.getFullName());
+		String pageNo = kpiPerspectiveForm.getPageNo().toString();
 		String createStr = kpiPerspectiveForm.getCreateDate();
 		Timestamp timestamp = Timestamp.valueOf(createStr);
-		kpiPerspectiveForm.getKpiPerspectiveModel().setCreatedDate(timestamp);
-		String pageNo = kpiPerspectiveForm.getPageNo().toString();
+		
+		kpiPerspectiveForm.getKpiPerspectiveModel().setAcademicYear(getCurrentYear());
+		kpiPerspectiveForm.getKpiPerspectiveModel().setUpdatedBy(user.getFullName());
+		kpiPerspectiveForm.getKpiPerspectiveModel().setCreatedDate(timestamp);	
 		
 		ResultService rs = service.updateKpiPerspective(kpiPerspectiveForm.getKpiPerspectiveModel());
 

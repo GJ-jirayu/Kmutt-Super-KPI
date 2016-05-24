@@ -44,8 +44,10 @@ import th.ac.chandra.eduqa.form.KpiForm;
 import th.ac.chandra.eduqa.form.KpiListForm;
 import th.ac.chandra.eduqa.mapper.ResultService;
 import th.ac.chandra.eduqa.model.DescriptionModel;
+import th.ac.chandra.eduqa.model.KpiGroupModel;
 import th.ac.chandra.eduqa.model.KpiLevelModel;
 import th.ac.chandra.eduqa.model.KpiModel;
+import th.ac.chandra.eduqa.model.KpiPerspectiveModel;
 import th.ac.chandra.eduqa.model.KpiResultModel;
 import th.ac.chandra.eduqa.model.KpiTargetModel;
 import th.ac.chandra.eduqa.model.OrgModel;
@@ -82,6 +84,20 @@ public class AssignKpiController {
 		model.addAttribute("userDetail","User: "+user.getScreenName()+""
 				+ ",  OrgId: "+org.getOrgId());
 		
+		Map<Integer,String> groupLists = new HashMap<Integer,String>();
+		List<KpiGroupModel> groups = service.searchKpiGroup(new KpiGroupModel());
+		for(KpiGroupModel group : groups){
+			groupLists.put(group.getGroupId(), group.getGroupName());
+		}
+		model.addAttribute("groupLists", groupLists);
+		
+		Map<Integer,String> perLists = new HashMap<Integer,String>();
+		List<KpiPerspectiveModel> pers = service.searchKpiPerspective(new KpiPerspectiveModel());
+		for(KpiPerspectiveModel per : pers){
+			perLists.put(per.getPerspcId(), per.getPerspcName());
+		}
+		model.addAttribute("perLists", perLists);
+		
 		KpiListForm kpiListForm=null;
 		if (!model.containsAttribute("kpiListForm")) {
 			kpiListForm = new KpiListForm();
@@ -98,17 +114,20 @@ public class AssignKpiController {
 			HieAuth.setUniversity(org.getUniversityCode());
 			HieAuth.setFaculty(org.getFacultyCode());
 			HieAuth.setCourse(org.getCourseCode());
-			model.addAttribute("hierarchyAuthorityForm",	HieAuth);
+			model.addAttribute("hierarchyAuthorityForm", HieAuth);
 		}else{
 			HieAuth = (HierarchyAuthorityForm)model.asMap().get("hierarchyAuthorityForm");
 		}
 		KpiResultModel resultModel = new KpiResultModel();
 		resultModel.setOrgId(org.getOrgId());
 		resultModel.setKpiLevelId(org.getLevelId()  );
+		resultModel.setKpiGroupId(groups.get(0).getGroupId()); //Get first Value from groups for setter whit KpiGroupId
+		resultModel.setKpiPerspectiveId(pers.get(0).getPerspcId()); //Get first Value from groups for setter whit KpiPerspectiveId
 		List<KpiResultModel> resultKpis = service.searchKpiResultWithActiveKpi(resultModel);
 		List<KpiListForm> lists = convertAccordion(resultKpis);
 		model.addAttribute("accordions",lists);
 		model.addAttribute("lastPage",service.getResultPage());
+		
 		// list
 		Map<Integer,String> levelList = new HashMap<Integer,String>();
 		List<KpiLevelModel> levels = service.searchKpiLevel(new KpiLevelModel());
@@ -125,10 +144,6 @@ public class AssignKpiController {
 		model.addAttribute("uniList",uniList);
 		
 		Map<String,String> facList = new HashMap<String,String>();
-		/*List<DescriptionModel> facs = service.getFacultyAll(new DescriptionModel());
-		for(DescriptionModel fac : facs){
-			facList.put(fac.getDescCode(),fac.getDescription());
-		}*/
 		List<OrgModel> facs = service.getOrgFacultyOfUniversity(org);
 		for(OrgModel fac : facs){
 			facList.put(fac.getFacultyCode(),fac.getFacultyName());
@@ -141,9 +156,11 @@ public class AssignKpiController {
 			corsList.put(cor.getDescCode(),cor.getDescription());
 		}
 		model.addAttribute("corsList",corsList);
-		model.addAttribute("currentFaculty", (org.getFacultyCode() == null ? 0 : org.getFacultyCode()));
-		model.addAttribute("currentCourse", (org.getCourseCode() == null ? 0 : org.getCourseCode()));
-
+		model.addAttribute("currentFaculty", (org.getFacultyCode() == null || org.getFacultyCode() == "" ? 0 : org.getFacultyCode()));
+		model.addAttribute("currentCourse", (org.getCourseCode() == null || org.getCourseCode() == "" ? 0 : org.getCourseCode()));
+		model.addAttribute("currentGroupId", 0);
+		model.addAttribute("currentPerspectiveId", 0);
+		
 		return "dataEntry/assignKpi";
 	}
 	
@@ -160,6 +177,9 @@ public class AssignKpiController {
 		org.setOrgId(Integer.parseInt(userOrg.getDescCode()));
 		org = service.findOrgById(org);
 		
+		Integer paramGroupId = Integer.parseInt(request.getParameter("groupId"));
+		Integer paramPerspectiveId = Integer.parseInt(request.getParameter("perspectiveId"));
+				
 		String workOrgId = validParamString(request.getParameter("workOrgId"));
 		OrgModel workOrg = new OrgModel();
 		workOrg.setOrgId(Integer.parseInt(workOrgId));
@@ -193,7 +213,9 @@ public class AssignKpiController {
 		}
 		KpiResultModel resultModel = new KpiResultModel();
 		resultModel.setOrgId(workOrg.getOrgId());
-		resultModel.setKpiLevelId(workOrg.getLevelId()  );
+		resultModel.setKpiLevelId(workOrg.getLevelId());
+		resultModel.setKpiGroupId(paramGroupId);
+		resultModel.setKpiPerspectiveId(paramPerspectiveId);
 		List<KpiResultModel> resultKpis = service.searchKpiResultWithActiveKpi(resultModel);
 		List<KpiListForm> lists = convertAccordion(resultKpis);
 		model.addAttribute("accordions",lists);
@@ -227,9 +249,26 @@ public class AssignKpiController {
 			corsList.put(cor.getDescCode(),cor.getDescription());
 		}
 		model.addAttribute("corsList",corsList);
+		
+		Map<Integer,String> groupLists = new HashMap<Integer,String>();
+		List<KpiGroupModel> groups = service.searchKpiGroup(new KpiGroupModel());
+		for(KpiGroupModel group : groups){
+			groupLists.put(group.getGroupId(), group.getGroupName());
+		}
+		model.addAttribute("groupLists", groupLists);
+		
+		Map<Integer,String> perLists = new HashMap<Integer,String>();
+		List<KpiPerspectiveModel> pers = service.searchKpiPerspective(new KpiPerspectiveModel());
+		for(KpiPerspectiveModel per : pers){
+			perLists.put(per.getPerspcId(), per.getPerspcName());
+		}
+		model.addAttribute("perLists", perLists);
 
-		model.addAttribute("currentFaculty", (HieAuth.getFaculty() == null ? 0 : HieAuth.getFaculty()));
-		model.addAttribute("currentCourse", (HieAuth.getCourse() == null ? 0 : HieAuth.getCourse()));
+		model.addAttribute("currentFaculty", (HieAuth.getFaculty() == null || HieAuth.getFaculty() == "" ? 0 : HieAuth.getFaculty()));
+		model.addAttribute("currentCourse", (HieAuth.getCourse() == null || HieAuth.getCourse() == "" ? 0 : HieAuth.getCourse()));
+		model.addAttribute("currentGroupId", (paramGroupId == null ? 0 : paramGroupId));
+		model.addAttribute("currentPerspectiveId", (paramPerspectiveId == null ? 0 : paramPerspectiveId));
+		
 		model.addAttribute("userDetail","User: "+user.getScreenName()+""
 				+ ",  OrgId: "+org.getOrgId()+""
 				+ ",  CurrentFaculity: "+HieAuth.getFaculty()+""
@@ -243,13 +282,17 @@ public class AssignKpiController {
 	public void actionSubmitFilter(javax.portlet.ActionRequest request, javax.portlet.ActionResponse response
 			,@ModelAttribute("HierarchyAuthorityForm") HierarchyAuthorityForm HieAuth,BindingResult result,Model model){
 		response.setRenderParameter("render", "showList");
-		response.setRenderParameter("workOrgId",HieAuth.findoutOrg() );
+		response.setRenderParameter("workOrgId",HieAuth.findoutOrg());
+		response.setRenderParameter("groupId",HieAuth.getGroupId().toString());
+		response.setRenderParameter("perspectiveId",HieAuth.getPerspectiveId().toString());
 	}
 	@RequestMapping(params="action=doBack2List") 
 	public void actionBack2List(javax.portlet.ActionRequest request, javax.portlet.ActionResponse response
 			,@ModelAttribute("assignTargetForm") AssignTargetForm assignTargetForm,BindingResult result,Model model){
 		response.setRenderParameter("render", "showList");
 		response.setRenderParameter("workOrgId",String.valueOf(assignTargetForm.getOrgId()) );
+		response.setRenderParameter("groupId","0");
+		response.setRenderParameter("perspectiveId","0");
 	}
 	// kpiList 
 	@RequestMapping(params="action=doAssignTarget") 
@@ -577,7 +620,7 @@ public class AssignKpiController {
 	}
 	
 	@ResourceMapping(value="doInsertResult")
-	@ResponseBody 
+	@ResponseBody
 	public void saveResultOfOrg(ResourceRequest request,ResourceResponse response) 
 			throws IOException{
 		// required orgId, kpisIds
@@ -590,10 +633,11 @@ public class AssignKpiController {
 		Integer success = 0;
 		User user = (User) request.getAttribute(WebKeys.USER);
 		
-		if( normalRequest.getParameter("orgId")!=null && normalRequest.getParameter("orgId")!=""){
+		if(normalRequest.getParameter("orgId")!=null && normalRequest.getParameter("orgId")!=""){
 			Integer orgId = Integer.parseInt(normalRequest.getParameter("orgId"));
 			String deleteKpis = normalRequest.getParameter("deleteKpis");
 			String insertKpis = normalRequest.getParameter("insertKpis");
+			String kpiWeights = normalRequest.getParameter("kpiWeights");
 			Integer deleteStatusCode = null, insertStatusCode = null; 
 			String deleteStatusDesc = "", insertStatusDesc = "";
 			
@@ -652,6 +696,7 @@ public class AssignKpiController {
 			//ตรวจสอบการทำงานในส่วนการลบ และบันทึก
 			if(insertStatusCode == 1 && deleteStatusCode == 1){
 				success = 1;
+				status = "insertStatusDesc: "+insertStatusDesc+",  deleteStatusDesc: "+deleteStatusDesc;
 			}else{
 				status = "insertStatusDesc: "+insertStatusDesc+",  deleteStatusDesc: "+deleteStatusDesc;
 			}
@@ -844,4 +889,5 @@ public class AssignKpiController {
 		//System.out.println(json.toString());
 		response.getWriter().write(json.toString());
 	}
+	
 }

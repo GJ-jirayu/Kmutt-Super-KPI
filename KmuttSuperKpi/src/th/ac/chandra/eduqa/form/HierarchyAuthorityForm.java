@@ -17,6 +17,9 @@ public class HierarchyAuthorityForm extends CommonForm implements Serializable{
 	private String faculty;
 	private String course;
 	
+	private Integer groupId;
+	private Integer perspectiveId;
+	
 	public HierarchyAuthorityForm() {
 		super();
 	}
@@ -66,5 +69,19 @@ public class HierarchyAuthorityForm extends CommonForm implements Serializable{
 			ret= this.getCourse();
 		}
 		return ret;
+	}
+	
+	
+	public Integer getGroupId() {
+		return groupId;
+	}
+	public void setGroupId(Integer group) {
+		this.groupId = group;
+	}
+	public Integer getPerspectiveId() {
+		return perspectiveId;
+	}
+	public void setPerspectiveId(Integer perspective) {
+		this.perspectiveId = perspective;
 	}
 }

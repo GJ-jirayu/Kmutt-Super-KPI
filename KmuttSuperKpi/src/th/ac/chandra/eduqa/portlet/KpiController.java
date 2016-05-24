@@ -119,6 +119,7 @@ public class KpiController {
 	public void newDetail(javax.portlet.ActionRequest request, javax.portlet.ActionResponse response,
 			@ModelAttribute("kpiListForm") KpiListForm kpiListForm,BindingResult result,Model model){
 		response.setRenderParameter("render", "showDetail");
+		response.setRenderParameter("actionStatus", "newkpi");
 	}
 	@RequestMapping(params="action=doEdit") 
 	public void editDetail(javax.portlet.ActionRequest request, javax.portlet.ActionResponse response,
@@ -126,12 +127,13 @@ public class KpiController {
 
 		response.setRenderParameter("render", "showDetail");
 		response.setRenderParameter("kpiId",String.valueOf( kpiListForm.getKpiId()) );
+		response.setRenderParameter("actionStatus", "editKpi");
 	}
 	
 	
 	@RequestMapping("VIEW")
 	@RenderMapping(params="render=showDetail")
-	public String showDetail(PortletRequest request,Model model){
+	public String showDetail(PortletRequest request,Model model, @RequestParam("actionStatus") String actionStatus){
 	//	if(request.getParameter("message")!=null){
 			model.addAttribute("actionMessage",request.getParameter("message"));
 			model.addAttribute("actionMessageCode",request.getParameter("messageCode"));
@@ -267,6 +269,7 @@ public class KpiController {
 			kpiForm.setKpiModel(kpiM);
 			model.addAttribute("kpiForm",kpiForm);
 		}
+		model.addAttribute("actionStatus", actionStatus);
 		return "master/kpiDetail";
 	}
 	
@@ -354,6 +357,7 @@ public class KpiController {
 		response.setRenderParameter("kpiId", String.valueOf(kpiId) );
 		response.setRenderParameter("message", message);
 		response.setRenderParameter("messageCode", messageCode);
+		response.setRenderParameter("actionStatus", "editKpi");
 	}
 	@RequestMapping(params = "action=doUpdateKpi") 
 	public void UpdateKpi(javax.portlet.ActionRequest request, javax.portlet.ActionResponse response,
@@ -379,6 +383,7 @@ public class KpiController {
 		response.setRenderParameter("kpiId", String.valueOf(kpiForm.getKpiModel().getKpiId()) );
 		response.setRenderParameter("message", "บันทึกสำเร็จ");
 		response.setRenderParameter("messageCode", "0");
+		response.setRenderParameter("actionStatus", "editKpi");
 	}
 	@RequestMapping(params = "action=doBack2List") 
 	public void back2List(javax.portlet.ActionRequest request, javax.portlet.ActionResponse response,
@@ -386,6 +391,8 @@ public class KpiController {
 			User user = (User) request.getAttribute(WebKeys.USER);
 			
 	}
+	
+	
 	/* #####  function */
 	private List<KpiListForm> convertAccordion(List<KpiModel> kpis){
 		ListIterator<KpiModel> kpisIter = kpis.listIterator();
@@ -397,9 +404,9 @@ public class KpiController {
 		while(kpisIter.hasNext()){
 			KpiModel kpi = (KpiModel) kpisIter.next();
 			
-			if(!kpi.getStructureId().equals(previousId) || previousId==null){ // if not
+			if(!kpi.getGroupId().equals(previousId) || previousId==null){ // if not
 				form = new KpiListForm();
-				form.setStructureName(kpi.getStructureName());
+				form.setStructureName(kpi.getGroupName());
 				listKpi = new ArrayList<KpiModel>();
 				listKpi.add(kpi);
 			}
@@ -408,9 +415,9 @@ public class KpiController {
 			}
 			//
 			if(kpisIter.hasNext()){
-				Integer current = kpi.getStructureId();
+				Integer current = kpi.getGroupId();
 				KpiModel next = (KpiModel) kpisIter.next();
-				if(!next.getStructureId().equals(current)){
+				if(!next.getGroupId().equals(current)){
 					form.setKpis(listKpi);
 					forms.add(form);
 				}
@@ -420,10 +427,12 @@ public class KpiController {
 				forms.add(form);
 			}
 			// last thing 
-			previousId = kpi.getStructureId();
+			previousId = kpi.getGroupId();
 		}	// end while iterator 
 		return forms;
 	}
+	
+	
 	// ajax 
 	@ResourceMapping(value="doSearchKpiName")
 	@ResponseBody 

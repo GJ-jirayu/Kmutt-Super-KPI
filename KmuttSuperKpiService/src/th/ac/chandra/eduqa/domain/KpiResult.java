@@ -156,6 +156,12 @@ public class KpiResult implements Serializable {
     @Column(name="FISCAL_MONTH_NO")
     private Integer fiscalMonthNo;
 	
+    @Column(name="CALENDAR_YEAR")
+    private Integer calendarYear;
+    
+    @Column(name="FISCAL_YEAR")
+    private Integer fiscalYear;
+    
 	/*//bi-directional many-to-one association to ResearcherGroup
 	@OneToMany(mappedBy="researchGroup")
 	private List<ResearcherGroup> researcherGroups;*/
@@ -449,5 +455,101 @@ public class KpiResult implements Serializable {
 
 	public void setActive(Integer active) {
 		this.active = active;
+	}
+
+	public String getKpiCode() {
+		return kpiCode;
+	}
+
+	public void setKpiCode(String kpiCode) {
+		this.kpiCode = kpiCode;
+	}
+
+	public Integer getKpiPerspectiveId() {
+		return kpiPerspectiveId;
+	}
+
+	public void setKpiPerspectiveId(Integer kpiPerspectiveId) {
+		this.kpiPerspectiveId = kpiPerspectiveId;
+	}
+
+	public String getKpiPerspectiveName() {
+		return kpiPerspectiveName;
+	}
+
+	public void setKpiPerspectiveName(String kpiPerspectiveName) {
+		this.kpiPerspectiveName = kpiPerspectiveName;
+	}
+
+	public Double getKpiWeight() {
+		return kpiWeight;
+	}
+
+	public void setKpiWeight(Double kpiWeight) {
+		this.kpiWeight = kpiWeight;
+	}
+
+	public Double getPercentWavg() {
+		return percentWavg;
+	}
+
+	public void setPercentWavg(Double percentWavg) {
+		this.percentWavg = percentWavg;
+	}
+
+	public Integer getParentKpiId() {
+		return parentKpiId;
+	}
+
+	public void setParentKpiId(Integer parentKpiId) {
+		this.parentKpiId = parentKpiId;
+	}
+
+	public String getHasChild() {
+		return hasChild;
+	}
+
+	public void setHasChild(String hasChild) {
+		this.hasChild = hasChild;
+	}
+
+	public Integer getCalendarMonthNo() {
+		return calendarMonthNo;
+	}
+
+	public void setCalendarMonthNo(Integer calendarMonthNo) {
+		this.calendarMonthNo = calendarMonthNo;
+	}
+
+	public Integer getAcademicMonthNo() {
+		return academicMonthNo;
+	}
+
+	public void setAcademicMonthNo(Integer academicMonthNo) {
+		this.academicMonthNo = academicMonthNo;
+	}
+
+	public Integer getFiscalMonthNo() {
+		return fiscalMonthNo;
+	}
+
+	public void setFiscalMonthNo(Integer fiscalMonthNo) {
+		this.fiscalMonthNo = fiscalMonthNo;
+	}
+
+	public Integer getCalendarYear() {
+		return calendarYear;
+	}
+
+	public void setCalendarYear(Integer calendarYear) {
+		this.calendarYear = calendarYear;
+	}
+
+	public Integer getFiscalYear() {
+		return fiscalYear;
+	}
+
+	public void setFiscalYear(Integer fiscalYear) {
+		this.fiscalYear = fiscalYear;
 	}
 }

@@ -85,8 +85,8 @@ public class ResultController {
 	@Autowired
 	@Qualifier("eduqaServiceWSImpl")
 	private EduqaService service;
-	//private String uploadDirectory = "/home/pwirun/app/Chandra/fileupload/";
-	private String uploadDirectory = "C:\\Users\\Administrator\\My Servers\\QIS\\FileServer\\fileupload";
+	private String uploadDirectory = "/home/gj-jirayu/Liferay/App/Kmutt-Kpi/UploadFile/";
+	//private String uploadDirectory = "C:\\Users\\Administrator\\My Servers\\QIS\\FileServer\\fileupload";
 	private String directoryDelimitor;
 	
 	@Autowired
@@ -236,8 +236,8 @@ public class ResultController {
 		
 		model.addAttribute("size",kpiResult.size());
 		model.addAttribute("lastPage",service.getResultPage());
-		model.addAttribute("currentFaculty", (org.getFacultyCode() == null ? 0 : org.getFacultyCode()));
-		model.addAttribute("currentCourse", (org.getCourseCode() == null ? 0 : org.getCourseCode()));
+		model.addAttribute("currentFaculty", (org.getFacultyCode() == null || org.getFacultyCode() == "" ? 0 : org.getFacultyCode()));
+		model.addAttribute("currentCourse", (org.getCourseCode() == null || org.getCourseCode() == "" ? 0 : org.getCourseCode()));
 		
 		return "dataEntry/resultList";
 	}

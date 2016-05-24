@@ -247,32 +247,44 @@
 		}
 
     	function doSubmitDetail(){
-    		var baseCriteriaType = $("#criteriaTypeStr").val();
-    		var newCriteriaType = $("select#criteriaMethod option:selected").val();
 
-    		if(baseCriteriaType != newCriteriaType){
-    			$.confirm({
-				    text: '"วิธีการประเมิน" มีการเปลี่ยนแปลง รายละเอียดของข้อมูลตัวบ่งชี้จะถูกลบ ท่านยืนยันการบันทึกหรือไม่',
-				    title: "ยืนยันการบันทึก ตัวบ่งชี้",
-				    confirm: function(button) {
-						if(doDeleteKpiChildTable() == "1"){
-							doSubmit(); 
-						}
+	    	if($("input#actionStatus").val() == "editKpi"){
+	    		var baseCriteriaType = $("#criteriaTypeStr");
+	    		var baseDetailCalendarType = $("#detailCalendarTypeStr");
+	    		var baseDetailPeriod = $("#detailPeriodStr");
 
-				    },
-				    cancel: function(button) {
-				        // nothing to do
-				    },
-				    confirmButton: "ยืนยัน",
-				    cancelButton: "ยกเลิก",
-				    post: true,
-				    confirmButtonClass: "btn-primary",
-				    cancelButtonClass: "btn-danger",
-				    dialogClass: "modal-dialog modal-lg" // Bootstrap classes for large modal
-				});
-    		}else{
-    			doSubmit();
-    		}
+	    		var newCriteriaType = $("select#criteriaMethod option:selected");
+	    		var newDetailCalendarType = $("select#detailCalendarType option:selected");
+	    		var newDetailPeriod = $("select#detailPeriod option:selected");
+
+	    		if(baseCriteriaType.val() != newCriteriaType.val() 
+	    			|| baseDetailCalendarType.val() != newDetailCalendarType.val() 
+	    			|| baseDetailPeriod.val() != newDetailPeriod.val()){
+	    			$.confirm({
+					    text: 'ท่านได้ทำการเปลี่ยนแปลงข้อมูลที่มีผล ทำให้เกณฑ์การประเมิน, เป้าหมาย หรือผลการดำเนินงาน อาจไม่ถูกต้อง <br/><br/> <font style="color:red"> <u style="color:red">หมายเหตุ</u> ถ้าท่านยืนบันทึกข้อมูล ระบบจะทำการลบข้อมูล เกณฑ์การประเมิน, เป้าหมาย และผลการดำเนินงาน เพื่อให้ข้อมูลถูกต้องท่านต้องบันทึกข้อมูลที่ถูกลบดังกล่าวใหม่</font>',
+					    title: "ยืนยันการบันทึก ตัวบ่งชี้",
+					    confirm: function(button) {
+							if(doDeleteKpiChildTable() == "1"){
+								doSubmit(); 
+							}
+
+					    },
+					    cancel: function(button) {
+					        // nothing to do
+					    },
+					    confirmButton: "ยืนยัน",
+					    cancelButton: "ยกเลิก",
+					    post: true,
+					    confirmButtonClass: "btn-primary",
+					    cancelButtonClass: "btn-danger",
+					    dialogClass: "modal-dialog modal-lg" // Bootstrap classes for large modal
+					});
+	    		}else{
+	    			doSubmit();
+	    		}
+	    	}else{
+	    		doSubmit();
+	    	}
     	}
 
     	function doSubmit(){
@@ -1405,6 +1417,8 @@
 </head>
 <body>
 	<div id="kpiDetail" class="box">
+		<input type="hidden" id="actionStatus" value="${actionStatus}"></input>
+
 		<input type="hidden" id="criteriaTypeStr" value=""></input>
 		<input type="hidden" id="pageMessage" value="${actionMessageCode}"/>
 		<c:if test="${not empty actionMessage}"> 

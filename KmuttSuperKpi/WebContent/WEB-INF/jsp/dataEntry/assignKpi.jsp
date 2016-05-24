@@ -47,14 +47,16 @@
     		if(!${not empty pageMessage}){
     			$('#pageMessage').css("display","none");
     		}
-    		$("#assignKpi_accordion").accordion({
+    		/*$("#assignKpi_accordion").accordion({
     			 heightStyle: "content",
     			 collapsible: true
-    		});
+    		});*/
     		// initial active select
     		ToggleEnableSelection();
     		renderParameterCtrl(getUserRoleLevelID());
     		KpiResultDefalutValueTemp();
+    		if(${currentGroupId} != 0){ $("#groupId").val(${currentGroupId}); }
+    		if(${currentPerspectiveId} != 0){$("#perspectiveId").val(${currentPerspectiveId}); }
 
     	});
 
@@ -289,7 +291,32 @@
    	 			target.append(opt);
    	 		}
    	 	}
-   	 	function insertResult(){
+
+   	 	function beforeInsertResult(){
+   	 		/*ทำการวนหา kpi ที่ถูกเลือกและดึงค่าถ่วงน้ำหนักมาคำนวนดูว่ารวมกันแล้วเท่ากับหนึ่งร้อยหรือไม่*/
+   	 		/*และทำการส่งค่าถ่วงน้ำหนัก ไปทำการบันทึกลงตาราง*/
+   	 		var currentWeightValArr = [];
+   	 		var sumValue = null;
+   	 		$("#assignKpi_accordion table.tableGridLv>tbody>tr").each(function(){
+   	 			if($(this).children("td:nth-child(2)").children('input[type="checkbox"]').is(':checked')){ 				
+   	   	 			var values = $(this).children("td:nth-child(7)").children('input[type="number"]').val();
+   	   	 			var kpiIds = $(this).children("td:nth-child(1)").html();
+   	   	 			currentWeightValArr.push($.trim(kpiIds)+":"+values);
+   	 				sumValue = sumValue + parseFloat(values);
+   	 			}else{
+   	 				$(this).children("td:nth-child(7)").children('input[type="number"]').val(0.00);
+   	 			}
+   	 		});
+   	 		//console.log("currentWeightValArr: "+currentWeightValArr);
+
+   	 		if(sumValue == null || sumValue == 100){
+   	 			insertResult(currentWeightValArr);
+   	 		}else{
+   	 			alert("ค่าถ่วงน้ำหนัก จะต้องรวมกันได้ 100 (รอคิดอีกที)");
+   	 		}
+   	 	}
+
+   	 	function insertResult(currentWeightValArr){
    	 		var currentValArr = [];
    	 		$("#assignKpi_accordion table.tableGridLv>tbody>tr").each(function(){
    	 			if($(this).children("td:nth-child(2)").children('input[type="checkbox"]').is(':checked')){
@@ -316,22 +343,25 @@
 			    }
 			});
 
-			console.log("deleteVal:"+deleteVal.join("-")+", insertVal:"+insertVal.join("-"));
+			//console.log("deleteVal:"+deleteVal.join("-")+", insertVal:"+insertVal.join("-"));
 
    	 		var orgId = $("#kpiListForm #orgId").val();
 	   	 	$.ajax({
 	   	 		dataType: "json",
 	   	 		url:"<%=doInsertResult%>",
-	   	 		data: { "orgId":orgId ,"deleteKpis":deleteVal.join("-"), "insertKpis":insertVal.join("-") },
-	   	 		//data: { "orgId":orgId ,"kpis":currentValArr.join("-")},	   	 		
+	   	 		data: { "orgId":orgId ,
+	   	 			"deleteKpis":deleteVal.join("-"), 
+	   	 			"insertKpis":insertVal.join("-"),
+	   	 			"kpiWeights":currentWeightValArr.join("-")
+	   	 		},	 		
 	   	 		async: false,
 	   	 		success:function(data){
-	   	 			//alert(JSON.stringify(data));
+	   	 			console.log(JSON.stringify(data));
 	   	 			if(data['header']['success']>0){
 		   	 			$('#pageMessage').html('บันทึกสำเร็จ');
 		   	 			$('#pageMessage').removeClass();
 		   	 			$('#pageMessage').addClass("alert");
-		   	 			toggleSetTargetBtn();
+		   	 			toggleSetTargetBtn();	 			
 	   	 			}else{
 		   	 			$('#pageMessage').html('บันทึกผิดพลาด '+data['header']['status']);
 		   	 			$('#pageMessage').removeClass();
@@ -342,16 +372,15 @@
 	   	 		}
 	   	 	});
 
-	   	 	KpiResultDefalutValueTemp(); 
+	   	 	KpiResultDefalutValueTemp();
    	 	}
+
    	 	function reloadResult(){
    	 		var orgId = $("#kpiListForm #orgId").val();
 	   	 	$.ajax({
 	   	 		dataType: "json",
 	   	 		url:"<%=doReloadResult%>",
-					data : {
-						"orgId" : orgId
-					},
+				data : {"orgId" : orgId},
 					success : function(data) {
 						if (data['header']['success'] > 0) {
 							$(
@@ -381,6 +410,7 @@
 					}
 				});
 	}
+
 	function toggleSetTargetBtn() {
 		$('#assignKpi_accordion table tbody tr').each(
 				function() {
@@ -415,24 +445,32 @@
 	}
 
 	#assignKpi_accordion table.tableGridLv td:nth-child(3) {
-		width: 10%
+		width: 40%
 	}
 
 	#assignKpi_accordion table.tableGridLv td:nth-child(4) {
-		width: 40%;
+		width: 10%;
 	}
 
 	#assignKpi_accordion table.tableGridLv td:nth-child(5) {
-		width: 16%;
-	}
-
-	#assignKpi_accordion table.tableGridLv td:nth-child(6) {
-		width: 13%;
+		width: 10%;
 	}
 
 	#assignKpi_accordion table.tableGridLv td:nth-child(6) {
 		width: 10%;
+	}
+
+	#assignKpi_accordion table.tableGridLv td:nth-child(7) {
+		width: 10%;
+		padding: 0px;
 	}   
+	#assignKpi_accordion table.tableGridLv td:nth-child(8) {
+		width: 10%;
+	} 
+	#assignKpi_accordion table.tableGridLv td:nth-child(7) input{
+		border-width: 0px 0px 1px 0px;
+		background-color: transparent;
+	}  
 	.center {text-align: center;}
 </style>
 </head>
@@ -440,8 +478,8 @@
 <body>
 	<!-- Input สำหรับเก็บ kpi_result id เดิมที่มีอยู่ใน database -->
 	<input type="hidden" id="cbxBaseVal" value=""></input> <br/>
-
-	<%-- Debug information 
+	<%-- 
+	Debug information 
 	userDetail: ${userDetail} <br/>
 	currentFaculty: ${currentFaculty} <br/>
 	currentCourse: ${currentCourse} <br/> 
@@ -454,27 +492,43 @@
 				name="hierarchyAuthorityForm" action="${formActionSubmitFilter}"
 				enctype="multipart/form-data">
 				<form:input type="hidden" id="idenOrgId" path="orgId" />
+
 				<span>ระดับตัวบ่งชี้: </span>
 				<form:select path="level" class="input-medium wid"
 					onchange="ParamLevelChange(this)">
 					<form:options items="${levelList}" />
 				</form:select>
+
+				<span>กลุ่มตัวบ่งชี้: </span>
+				<form:select id="groupId" path="groupId" class="input-xlarge wid">
+					<form:options items="${groupLists}" />
+				</form:select>
+
+				<span>มุมมอง: </span>
+				<form:select id="perspectiveId" path="perspectiveId" class="input-large wid">
+					<form:options items="${perLists}" />
+				</form:select>
 				<br/>
+
 				<span>สถาบัน/มหาวิทยาลัย: </span>
 				<form:select class="wid input-large" id="filterUni" path="university"
 					onchange="ParamChange(this,'university')">
 					<form:options items="${uniList}" />
 				</form:select>
+
 				<span>คณะ: </span>
 				<form:select class="wid input-xlarge" id="filterFac" path="faculty"
 					onchange="ParamChange(this,'faculty')">
 					<!-- Generate option by GenParamFacultyList(). -->
 				</form:select>
+
 				<span>หลักสูตร: </span>
 				<form:select class="wid input-xlarge" id="filterCou" path="course">
 					<!-- Generate option by GenParamCourseList(). -->
 				</form:select>
-				<input type="button" value="เรียกดู" onclick="submitFilter()" class="btn btn-primary" style="margin-bottom: 10px;" />
+
+				<input type="button" value="เรียกดู" onclick="submitFilter()" class="btn btn-primary" 
+				style="margin-bottom: 10px;"/>
 			</form:form>
 		</div>
 		
@@ -488,6 +542,76 @@
 		</form:form>
 
 		<div id="assignKpi_accordion" class="">
+		<c:if test="${not empty accordions}">
+			<div class="table-responsive">
+				<table class="tableGridLv hoverTable">
+					<thead>
+						<tr>
+							<th style="display: none;">รหัสตัวบ่งชี้</th>
+							<th style="text-align: center">เลือก</th>
+							<th>ชื่อตัวบ่งชี้</td>
+							<th>ประเภทปฏิทิน</td>
+							<th class="center">ช่วงเวลา</th>
+							<th class="center">หน่วยวัด</th>
+							<th class="center">ค่าถ่วงน้ำนัก</th>
+							<th class="center">เป้าหมาย</th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach items="${accordions}" var="accordion" varStatus="acLoop">
+						<c:forEach items="${accordion.resultKpis}" var="kpi" varStatus="loop">
+							<tr id="r${kpi.kpiId}">
+								<td style="display: none;">${kpi.kpiId}</td>
+								<td style="text-align: center">
+									<c:choose>
+										<c:when test="${kpi.resultId>0}">
+											<input type="checkbox" name="isUsed" value="1" checked>
+										</c:when>
+										<c:otherwise>
+											<input type="checkbox" name="isUsed" value="1">
+										</c:otherwise>
+									</c:choose>
+								</td>
+								<td>${chandraFn:nl2br(kpi.kpiName)}</td>
+								<td class="center">${chandraFn:nl2br(kpi.calendarTypeName)}</td>
+								<td class="center">${chandraFn:nl2br(kpi.periodName)}</td>
+								<td class="center">${chandraFn:nl2br(kpi.kpiUomName)}</td>
+								<td class="center" valign="midden">
+									<input id="kpiWeight-${kpi.kpiId}" class="input-mini kpiWeight" type="number" 
+									value="0.00" step="0.25" max="100"/>							
+								</td>
+								<td class="center">
+									<c:choose>
+										<c:when test="${kpi.resultId>0}">												
+											<c:choose>
+												<c:when test="${not empty kpi.targetValue && kpi.targetValue > 0}">
+													<a href="#" class="icon" onClick="actTarget(this)">
+														<img src="<c:url value="/resources/images/edited-assign.png"/>" width="25" height="25">
+													</a>
+												</c:when>
+												<c:otherwise>
+													<a href="#" class="icon" onClick="actTarget(this)">
+													<img src="<c:url value="/resources/images/edited.png"/>" width="25" height="25">
+													</a>
+												</c:otherwise>
+											</c:choose>
+										</c:when>
+										<c:otherwise>
+											<a href="#" class="icon" onClick="actTarget(this)" style="display: none">
+												<img src="<c:url value="/resources/images/edited.png"/>" width="22" height="22">
+											</a>
+										</c:otherwise>
+									</c:choose>
+								</td>
+							</tr>
+						</c:forEach>
+						</c:forEach>
+					</tbody>
+				</table>
+			</div>
+		</c:if>
+		</div>
+		<%-- <!-- <div id="assignKpi_accordion" class="">
 			<c:if test="${not empty accordions}">
 				<c:forEach items="${accordions}" var="accordion" varStatus="acLoop">
 					<h3>${accordion.structureName}</h3>
@@ -555,9 +679,9 @@
 
 				</c:forEach>
 			</c:if>
-		</div>
+		</div> --> --%>
 		<div style="text-align:center;padding:25px 10px 25px 10px;">		
-			<input type="button" class="btn btn-success" onclick="insertResult()" value="บันทึก" style="margin-right:10px"/>
+			<input type="button" class="btn btn-success" onclick="beforeInsertResult()" value="บันทึก" style="margin-right:10px"/>
 			<input type="button" class="btn btn-inverse" onclick="reloadResult()" value="กลับสู่ค่าเริ่มต้น"> 
 		</div>
 		<div style="text-align:center;" >

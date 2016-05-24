@@ -53,12 +53,15 @@ public class KpiResultModel extends ImakeXML implements Serializable{
     private Integer kpiPerspectiveId;
     private String kpiPerspectiveName;
     private Double kpiWeight;
+    private List<Double> kpiWeights;
     private Double percentWavg;
     private Integer parentKpiId;
     private String hasChild;
     private Integer calendarMonthNo;
     private Integer academicMonthNo;
     private Integer fiscalMonthNo;
+    private Integer calendarYear;
+    private Integer fiscalYear;
 	
 	public KpiResultModel() {
 	}
@@ -445,6 +448,30 @@ public class KpiResultModel extends ImakeXML implements Serializable{
 
 	public void setFiscalMonthNo(Integer fiscalMonthNo) {
 		this.fiscalMonthNo = fiscalMonthNo;
+	}
+
+	public Integer getCalendarYear() {
+		return calendarYear;
+	}
+
+	public void setCalendarYear(Integer calendarYear) {
+		this.calendarYear = calendarYear;
+	}
+
+	public Integer getFiscalYear() {
+		return fiscalYear;
+	}
+
+	public void setFiscalYear(Integer fiscalYear) {
+		this.fiscalYear = fiscalYear;
+	}
+
+	public List<Double> getKpiWeights() {
+		return kpiWeights;
+	}
+
+	public void setKpiWeights(List<Double> kpiWeights) {
+		this.kpiWeights = kpiWeights;
 	}
 	
 }

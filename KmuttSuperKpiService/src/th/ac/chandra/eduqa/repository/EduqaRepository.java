@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,7 +80,7 @@ import th.ac.chandra.eduqa.xstream.common.Paging;
 @Transactional
 public class EduqaRepository   {
 	//private static final String SELECT_QUERY = "select p from JournalPaper p";
-
+	
 	@Autowired
 	@PersistenceContext(unitName="HibernatePersistenceUnit") 
 	private EntityManager entityManager;
@@ -955,7 +956,7 @@ public class EduqaRepository   {
 		" ,kpi.kpi_id"+
 		 ",kpi.kpi_name "+
 		" ,ct.criteria_type_name "+
-		" ,g.kpi_group_short_name "+
+		" ,concat(kpi_group_name,'(',kpi_group_short_name,')')"+
 		" ,t.kpi_type_name "+
 		" ,cd.calendar_type_name " +
 		" ,p.period_name"+
@@ -963,6 +964,7 @@ public class EduqaRepository   {
 		" ,kpi.kpi_code "+
 		" ,kp.kpi_perspective_id "+
 		" ,kp.kpi_perspective_name "+
+		" ,g.kpi_group_id "+
 		" from kpi "+
 		" left join kpi_group g on kpi.kpi_group_id = g.kpi_group_id "+
 		" left join kpi_structure s on s.kpi_structure_id = kpi.kpi_structure_id "+
@@ -970,8 +972,9 @@ public class EduqaRepository   {
 		" left join criteria_type ct on ct.criteria_type_id = kpi.criteria_type_id "
 		+ " left join calendar_type cd on kpi.calendar_type_id = cd.calendar_type_id"
 		+ " left join period p on kpi.period_id = p.period_id"
-		+ " left join kpi_uom um on kpi.kpi_uom_id = um.kpi_uom_id "  + sb.toString() 
-		+ " left join kpi_perspective kp on kp.kpi_perspective_id = kpi.kpi_perspective_id"
+		+ " left join kpi_uom um on kpi.kpi_uom_id = um.kpi_uom_id "  
+		+ " left join kpi_perspective kp on kp.kpi_perspective_id = kpi.kpi_perspective_id "
+		+ sb.toString() 
 		+" order by kpi.kpi_structure_id,kpi.kpi_name ";
 		Query query =  entityManager.createNativeQuery(sql);
 		query.setFirstResult((pagging.getPageNo()-1) * pagging.getPageSize()); 
@@ -993,6 +996,7 @@ public class EduqaRepository   {
 		    kpi.setKpiCode((String)result[10]);
 		    kpi.setKpiPerspectiveId((Integer)result[11]);
 		    kpi.setKpiPerspectiveName((String)result[12]);
+		    kpi.setGroupId((Integer)result[13]);
 		    kpis.add(kpi);
 		}
 		ArrayList transList = new ArrayList();
@@ -1932,7 +1936,8 @@ public class EduqaRepository   {
 			result.setResultId(null);
 			Double monthValue = monthList.get(monthNum);
 			result.setTargetValue(monthValue);
-			//find monthId from calendarMonth
+			
+			//find monthId from calendarMonth//
 			String sql = "select p from SysMonth p "
 					+ " where p.academicYear = "+resultD1.getAcademicYear()+" and  p.calendarMonthNo = "+monthNum;
 			Query query = entityManager.createQuery(sql, SysMonth.class);
@@ -1940,13 +1945,43 @@ public class EduqaRepository   {
 			List fmonth = query.getResultList();
 			SysMonth sysMonth =  ((SysMonth)fmonth.get(0));
 			result.setMonthID(sysMonth.getMonthId());
-			String qCheck = "select result_id from kpi_result where org_id = "+result.getOrgId()+" and kpi_id = "+result.getKpiId()+" and month_id = "+result.getMonthID();
+			
+			String qCheck = "select "
+					+ "result_id, " 
+					+ "kpi_perspective_id, " 
+					+ "kpi_perspective_name, "
+					+ "kpi_weight, "
+					+ "calendar_year, "
+					+ "fiscal_year, "
+					+ "academic_month_no, "
+					+ "calendar_month_no, "
+					+ "fiscal_month_no, "
+					+ "kpi_code, "
+					+ "parent_kpi_id, "
+					+ "has_child, "
+					+ "formula_desc, "
+					+ "multiplicand, "
+					+ "denominator " 
+					+ "from kpi_result where org_id = "+result.getOrgId()+" and kpi_id = "+result.getKpiId()+" and month_id = "+result.getMonthID();
 			Query queryCheck = entityManager.createNativeQuery(qCheck);
-		//	queryCheck.setMaxResults(1);
-			List resultCheck = queryCheck.getResultList();
-			if(resultCheck.size()==0){
-			}else{
-				result.setResultId((Integer)resultCheck.get(0));
+			List<Object[]> resultCheck = queryCheck.getResultList();			
+			if(resultCheck.size() > 0){
+				Object[] resultRow = resultCheck.get(0);
+				result.setResultId((Integer) resultRow[0]);
+				result.setKpiPerspectiveId((Integer) resultRow[1]);
+				result.setKpiPerspectiveName((String) resultRow[2]);
+				result.setKpiWeight(Double.parseDouble(resultRow[3].toString()));
+				result.setCalendarYear((Integer) resultRow[4]);
+				result.setFiscalYear((Integer) resultRow[5]);
+				result.setAcademicMonthNo((Integer) resultRow[6]);
+				result.setCalendarMonthNo((Integer) resultRow[7]);
+				result.setFiscalMonthNo((Integer) resultRow[8]);
+				result.setKpiCode((String) resultRow[9]);
+				result.setParentKpiId((Integer) resultRow[10]);
+				result.setHasChild(resultRow[11]==null ? "0" : resultRow[11].toString());	
+				result.setFormulaDesc((String) resultRow[12]);	
+				result.setMultiplicand((String) resultRow[13]);	
+				result.setDenominator((String) resultRow[14]);	
 				result.setActive(1);
 				entityManager.merge(result);
 				size++;
@@ -2021,7 +2056,7 @@ public class EduqaRepository   {
 	}
 
 	
-	// =====[ END: KPI RESULT ]================================================================================//
+	// =====[ END: TARGET ]================================================================================//
 
 	// =====[ START: KPI RESULT ]==============================================================================//
 		public Integer saveKpiResult(KpiResult transientInstance)	throws DataAccessException {
@@ -2132,18 +2167,41 @@ public class EduqaRepository   {
 		
 		public List searchKpiResultWithActiveKpi(KpiResultModel model){
 			List<KpiResultModel> kms = new ArrayList<KpiResultModel>();
-			String sql = " select kpi.kpi_structure_id,ks.kpi_structure_name,kpi.kpi_id,kpi.kpi_name,grp.kpi_group_short_name "
-					+ " ,ct.calendar_type_name,p.period_name,uom.kpi_uom_name "
-					+ " ,(select ifnull(max(active),0) from kpi_result r where r.kpi_id = kpi.kpi_id  "
-					+ " and r.academic_year="+model.getAcademicYear()+" and org_id = "+model.getOrgId()+"  ) as used "
-					+ " ,(select cast(max(target_value) as char) from kpi_result where kpi_id = kpi.kpi.kpi_id group by kpi_id) as targetvalue "
-					+ " from (select * from kpi where academic_year = "+model.getAcademicYear()+" and kpi_level_id="+model.getKpiLevelId()+" ) kpi "
-					+ " left join kpi_structure ks on ks.kpi_structure_id = kpi.kpi_structure_id and ks.academic_year = kpi.academic_year "
-					+ " left join kpi_group grp on kpi.kpi_group_id = grp.kpi_group_id and kpi.academic_year = grp.academic_year "
-					+ " left join calendar_type ct on kpi.calendar_type_id = ct.calendar_type_id  "
-					+ " left join period p on kpi.period_id = p.period_id "
-					+ " left join kpi_uom uom on kpi.kpi_uom_id = uom.kpi_uom_id  and kpi.academic_year = uom.academic_year "
-					+ " order by kpi_structure_id,kpi.kpi_name ";
+			String sql= "select kpi.kpi_structure_id,"
+					+ "		ks.kpi_structure_name,"
+					+ " 	kpi.kpi_id,kpi.kpi_name,"
+					+ " 	grp.kpi_group_short_name,"
+					+ " 	ct.calendar_type_name,"
+					+ " 	p.period_name,"
+					+ " 	uom.kpi_uom_name,"
+					+ " 	(select ifnull(max(active),0)" 
+					+ " 	from kpi_result r"
+					+ " 	where r.kpi_id = kpi.kpi_id"   
+					+ " 	and r.academic_year="+model.getAcademicYear()
+					+ " 	and org_id ="+model.getOrgId()+") as used,"
+					+ " 	(select cast(max(target_value) as char)" 
+					+ " 	from kpi_result where kpi_id = kpi.kpi.kpi_id" 
+					+ " 	group by kpi_id) as targetvalue,"
+					+ " 	kpi.kpi_perspective_id,"
+					+ " 	kp.kpi_perspective_name,"
+					+ "		(select max(kpi_weight) from kpi_result kr where kr.kpi_id = kpi.kpi_id)"
+					+ " from ("
+					+ "		select * from kpi "
+					+ "		where academic_year="+model.getAcademicYear()
+					+ "		and kpi_level_id="+model.getKpiLevelId()
+					+ "		and kpi_perspective_id="+model.getKpiPerspectiveId()
+					+ "		and kpi_group_id = "+model.getKpiGroupId()
+					+ "	) kpi"
+					+ " left join kpi_structure ks on ks.kpi_structure_id = kpi.kpi_structure_id"
+					+ " 	and ks.academic_year = kpi.academic_year"  
+					+ " left join kpi_group grp on kpi.kpi_group_id = grp.kpi_group_id" 
+					+ " 	and kpi.academic_year = grp.academic_year"  
+					+ " left join calendar_type ct on kpi.calendar_type_id = ct.calendar_type_id"  
+					+ " left join period p on kpi.period_id = p.period_id"  
+					+ " left join kpi_uom uom on kpi.kpi_uom_id = uom.kpi_uom_id"  
+					+ " 	and kpi.academic_year = uom.academic_year" 
+					+ " left join kpi_perspective kp on kp.kpi_perspective_id = kpi.kpi_perspective_id" 
+					+ " order by kpi_structure_id,kpi.kpi_name";
 			
 			Query query = entityManager.createNativeQuery(sql);
 			if(query.getResultList().size()>0){
@@ -2161,6 +2219,9 @@ public class EduqaRepository   {
 					km.setResultId(Integer.parseInt(result[8].toString())); //km.setResultId(  ((BigInteger)result[8]).intValue() );  //  mean flag active field 
 				//	km.setResultId(  (Integer)result[8] );  //  mean flag active field 
 					km.setTargetValue( (result[9] != null ? Double.parseDouble(result[9].toString()) : null) );
+					km.setKpiPerspectiveId((Integer)result[10]);
+					km.setKpiPerspectiveName((String)result[11]);
+					km.setKpiWeight( (result[12] != null ? Double.parseDouble(result[12].toString()) : 0.00) );
 					kms.add(km);
 				}
 			}
@@ -2182,8 +2243,9 @@ public class EduqaRepository   {
 			Org org = (Org) qOrg.getResultList().get(0);
 			entityManager.flush();
 			
-			try{	
+			try{
 				List<Integer> kidIdList = model.getKpiIds();
+				int index = 0;
 				for( Integer kid : kidIdList){
 					
 					/*ตรวจสอบว่ามี kpi_result แล้วหรือยัง(โดยมี academicYrat, orgId, kpiId เป็นเงื่อนไข)*/
@@ -2192,15 +2254,15 @@ public class EduqaRepository   {
 							+" and kpi_id = "+kid;
 					Query verifyKpiResultQuery = entityManager.createNativeQuery(verifyKpiResult);
 					Integer rowSize = verifyKpiResultQuery.getResultList().size();
-					//System.out.println("\n --kpiId "+kid+" rowSize--> : "+rowSize+"\n");
+					System.out.println("\n --rowSize--> "+rowSize+" \n");
 					
 					/*กรณียังไม่มี result ทำการ insert ทั้ง 12 เดือน*/
-					if(rowSize == 0){
+					if(rowSize == 0){ System.out.println("\n System Only. \n");
 						KpiResult domain = new KpiResult();
 						domain.setResultId(null);
 						domain.setOrgId(model.getOrgId());
 						domain.setOrgName(org.getOrgName());
-						domain.setKpiId(kid); 
+						domain.setKpiId(kid);
 						domain.setAcademicYear(model.getAcademicYear());
 						domain.setCreatedBy(model.getCreatedBy());
 						domain.setUpdatedBy(model.getUpdatedBy());
@@ -2217,6 +2279,11 @@ public class EduqaRepository   {
 								" ,kpi.kpi_uom_id,uom.kpi_uom_name " +
 								" ,kpi.criteria_type_id " +
 								" ,coalesce(kpi.benchmark_value,0.00) as bv "+
+								" ,kpi.kpi_code "+
+								" ,kpi.kpi_perspective_id "+
+								" ,kp.kpi_perspective_name "+
+								" ,kpi.parent_kpi_id "+
+								" ,(select case when count(parent_kpi_id) > 0 then '1' else '0' end from kpi k2 where k2.parent_kpi_id = kpi.kpi_id) "+
 								" FROM  (select * from kpi where kpi_id = "+kid+" ) kpi  "+
 								" left join kpi_level lv on kpi.kpi_level_id=lv.kpi_level_id "+
 								" left join kpi_group grp on grp.kpi_group_id = kpi.kpi_group_id "+
@@ -2224,7 +2291,8 @@ public class EduqaRepository   {
 								" left join kpi_type t on t.kpi_type_id=kpi.kpi_type_id "+
 								" left join calendar_type c on c.calendar_type_id = kpi.calendar_type_id "+
 								" left join period p on p.period_id = kpi.period_id "+
-								" left join kpi_uom uom on uom.kpi_uom_id = kpi.kpi_uom_id ";
+								" left join kpi_uom uom on uom.kpi_uom_id = kpi.kpi_uom_id "+
+								" left join kpi_perspective kp on kp.kpi_perspective_id = kpi.kpi_perspective_id ";
 						Query query = entityManager.createNativeQuery(q1);
 						query.setMaxResults(1);
 						
@@ -2250,6 +2318,13 @@ public class EduqaRepository   {
 						domain.setCriteriaTypeId((Integer)ob[19]);
 						domain.setBenchmarkValue( ((BigDecimal)ob[20]).doubleValue());
 						domain.setActive(1);
+						domain.setKpiCode((String) ob[21]);
+						domain.setKpiPerspectiveId((Integer) ob[22]);
+						domain.setKpiPerspectiveName((String) ob[23]);
+						domain.setParentKpiId((Integer) ob[24]);
+						domain.setHasChild((String) ob[25]);
+						domain.setKpiWeight(0.00);
+						domain.setPercentWavg(0.00);
 						
 						/* Distrubute month 1-21 */	
 						for(Integer i = 1;i<=12;i++){
@@ -2267,12 +2342,18 @@ public class EduqaRepository   {
 							query = entityManager.createQuery(sqlMonth,SysMonth.class);
 							SysMonth month = (SysMonth) query.getResultList().get(0);
 							mm.setMonthID(month.getMonthId());
+							mm.setCalendarYear(month.getCalendarYear());
+							mm.setAcademicYear(month.getAcademicYear());
+							mm.setFiscalYear(month.getFiscalYear());
+							mm.setCalendarMonthNo(month.getCalendarMonthNo());
+							mm.setAcademicMonthNo(month.getAcademicMonthNo());
+							mm.setFiscalMonthNo(month.getFiscalMonthNo());							
 							entityManager.persist(mm);
 						}
 					}
 					
 					/*มี result แต่ไม่ครบ 12 เดือน ทำการลบข้อมูลเก่าออก แล้วบันทึกใหม่ทั้ง 12 เดือน โดยมี active = 1*/
-					else if(rowSize > 0 && rowSize < 12){ 
+					else if(rowSize > 0 && rowSize < 12){ System.out.println("\n Delete and Insert \n");
 						/* Delete old result*/
 						/* Converting a Kpis into Comma Separated value string */
 						StringBuilder commaSepKpis = new StringBuilder();
@@ -2311,6 +2392,11 @@ public class EduqaRepository   {
 								" ,kpi.kpi_uom_id,uom.kpi_uom_name " +
 								" ,kpi.criteria_type_id " +
 								" ,coalesce(kpi.benchmark_value,0.00) as bv "+
+								" ,kpi.kpi_code "+
+								" ,kpi.kpi_perspective_id "+
+								" ,kp.kpi_perspective_name "+
+								" ,kpi.parent_kpi_id "+
+								" ,(select case when count(parent_kpi_id) > 0 then '1' else '0' end from kpi k2 where k2.parent_kpi_id = kpi.kpi_id) "+
 								" FROM  (select * from kpi where kpi_id = "+kid+" ) kpi  "+
 								" left join kpi_level lv on kpi.kpi_level_id=lv.kpi_level_id "+
 								" left join kpi_group grp on grp.kpi_group_id = kpi.kpi_group_id "+
@@ -2318,13 +2404,14 @@ public class EduqaRepository   {
 								" left join kpi_type t on t.kpi_type_id=kpi.kpi_type_id "+
 								" left join calendar_type c on c.calendar_type_id = kpi.calendar_type_id "+
 								" left join period p on p.period_id = kpi.period_id "+
-								" left join kpi_uom uom on uom.kpi_uom_id = kpi.kpi_uom_id ";
+								" left join kpi_uom uom on uom.kpi_uom_id = kpi.kpi_uom_id "+
+								" left join kpi_perspective kp on kp.kpi_perspective_id = kpi.kpi_perspective_id ";
 						Query query = entityManager.createNativeQuery(q1);
 						query.setMaxResults(1);
 						
 						Object[] ob = (Object[]) query.getResultList().get(0);
 						domain.setKpiName((String)ob[1]);
-						domain.setFormulaDesc( (String) ob[2]);
+						domain.setFormulaDesc( ((String) ob[2] == null ? "" : (String) ob[2]));
 						domain.setKpiLevelId((Integer)ob[3]);
 						domain.setKpiLevelName((String)ob[4]);
 						domain.setKpiGroupId((Integer)ob[5]);
@@ -2344,6 +2431,13 @@ public class EduqaRepository   {
 						domain.setCriteriaTypeId((Integer)ob[19]);
 						domain.setBenchmarkValue( ((BigDecimal)ob[20]).doubleValue());
 						domain.setActive(1);
+						domain.setKpiCode((String) ob[21]);
+						domain.setKpiPerspectiveId((Integer) ob[22]);
+						domain.setKpiPerspectiveName((String) ob[23]);
+						domain.setParentKpiId((Integer) ob[24]);
+						domain.setHasChild((String) ob[25]);
+						domain.setKpiWeight(0.00);
+						domain.setPercentWavg(0.00);
 						
 						/* Distrubute month 1-21 */	
 						for(Integer i = 1;i<=12;i++){
@@ -2361,12 +2455,18 @@ public class EduqaRepository   {
 							query = entityManager.createQuery(sqlMonth,SysMonth.class);
 							SysMonth month = (SysMonth) query.getResultList().get(0);
 							mm.setMonthID(month.getMonthId());
+							mm.setCalendarYear(month.getCalendarYear());
+							mm.setAcademicYear(month.getAcademicYear());
+							mm.setFiscalYear(month.getFiscalYear());
+							mm.setCalendarMonthNo(month.getCalendarMonthNo());
+							mm.setAcademicMonthNo(month.getAcademicMonthNo());
+							mm.setFiscalMonthNo(month.getFiscalMonthNo());		
 							entityManager.persist(mm);
 						}
 					}
 					
-					/* มี result และครบ 12 เดือน ทำการ updata active = 1 */ 
-					else if(rowSize >= 12){
+					/* มี result และครบ 12 เดือน ทำการ updata active = 1 และ update weight ใหม่*/ 
+					else if(rowSize >= 12){ System.out.println("\n Update Only. \n");
 						/* Converting a Kpis into Comma Separated value string */
 						StringBuilder commaSepKpis = new StringBuilder();
 						for (int i = 0; i < model.getKpiIds().size(); i++) {
@@ -2382,6 +2482,7 @@ public class EduqaRepository   {
 						int deletedCount = entityManager.createNativeQuery(sql).executeUpdate();
 						entityManager.flush();
 					}
+					index++;
 				}
 				success = 1;
 				entityManager.flush();
@@ -2389,96 +2490,20 @@ public class EduqaRepository   {
 				success = 0;
 				System.out.print(ex);
 			}
-			/*
-			Integer success = 0; 
-			Query qOrg = entityManager.createQuery("select o from Org o where o.orgId ="+model.getOrgId(),Org.class);
-			Org org = (Org) qOrg.getResultList().get(0);
-			entityManager.flush();
-			
-			try{
-				List<Integer> kids = model.getKpiIds();
-				for( Integer kid : kids){
-					KpiResult domain = new KpiResult();
-					domain.setResultId(null);
-					domain.setOrgId(model.getOrgId());
-					domain.setOrgName(org.getOrgName());
-					domain.setKpiId(kid); 
-					domain.setAcademicYear(model.getAcademicYear());
-					domain.setCreatedBy(model.getCreatedBy());
-					domain.setUpdatedBy(model.getUpdatedBy());
-					domain.setCreatedDate(model.getCreatedDate());
-					domain.setUpdatedDate(model.getUpdatedDate());
-					String q1 = " SELECT "+
-							" kpi.kpi_id , kpi.kpi_name,kpi.formula_desc "+
-							" ,kpi.kpi_level_id,lv.kpi_level_name "+
-							" ,kpi.kpi_group_id,grp.kpi_group_short_name,grp.kpi_group_name "+
-							" ,kpi.kpi_structure_id,st.kpi_structure_name "+
-							" ,kpi.kpi_type_id,t.kpi_type_name,t.kpi_type_short_name "+
-							" ,kpi.calendar_type_id,c.calendar_type_name "+
-							" ,kpi.period_id,p.period_name "+
-							" ,kpi.kpi_uom_id,uom.kpi_uom_name " +
-							" ,kpi.criteria_type_id " +
-							" ,coalesce(kpi.benchmark_value,0.00) as bv "+
-							" FROM  (select * from kpi where kpi_id = "+kid+" ) kpi  "+
-							" left join kpi_level lv on kpi.kpi_level_id=lv.kpi_level_id "+
-							" left join kpi_group grp on grp.kpi_group_id = kpi.kpi_group_id "+
-							" left join kpi_structure st on st.kpi_structure_id=kpi.kpi_structure_id "+
-							" left join kpi_type t on t.kpi_type_id=kpi.kpi_type_id "+
-							" left join calendar_type c on c.calendar_type_id = kpi.calendar_type_id "+
-							" left join period p on p.period_id = kpi.period_id "+
-							" left join kpi_uom uom on uom.kpi_uom_id = kpi.kpi_uom_id ";
-					Query query = entityManager.createNativeQuery(q1);
-					query.setMaxResults(1);
-					
-					Object[] ob = (Object[]) query.getResultList().get(0);
-					domain.setKpiName((String)ob[1]);
-					domain.setFormulaDesc( (String) ob[2]);
-					domain.setKpiLevelId((Integer)ob[3]);
-					domain.setKpiLevelName((String)ob[4]);
-					domain.setKpiGroupId((Integer)ob[5]);
-					domain.setKpiGroupShortName((String)ob[6]);
-					domain.setKpiGroupName((String)ob[7]);
-					domain.setKpiStructureId((Integer)ob[8]);
-					domain.setKpiStructureName((String)ob[9]);
-					domain.setKpiTypeId((Integer)ob[10]);
-					domain.setKpiTypeName((String)ob[11]);
-					domain.setKpiTypeShortName((String)ob[12]);
-				//	domain.setCalendarTypeId((Integer)ob[13]);
-					domain.setCalendarTypeName((String)ob[14]);
-				//	domain.setPeriodId((Integer)ob[15]);
-					domain.setPeriodName((String)ob[16]);
-					domain.setKpiUomId((Integer)ob[17]);
-					domain.setKpiUomName((String)ob[18]);
-					domain.setCriteriaTypeId((Integer)ob[19]);
-					domain.setBenchmarkValue( ((BigDecimal)ob[20]).doubleValue());
-					// distrubute month 1-21
-
-					for(Integer i = 1;i<=12;i++){
-						KpiResult mm = new KpiResult();
-						BeanUtils.copyProperties(domain, mm);
-						String sqlMonth = "select m from SysMonth m where m.academicYear="+mm.getAcademicYear();
-						if(mm.getCalendarTypeName().equals("ปีปฏิทิน")){
-							sqlMonth = sqlMonth + " and m.calendarMonthNo="+i;
-						}else if(mm.getCalendarTypeName().equals("ปีการศึกษา")){
-							sqlMonth = sqlMonth + " and m.academicMonthNo="+i;
-						}else if(mm.getCalendarTypeName().equals("ปีงบประมาณ")){
-							sqlMonth = sqlMonth + " and m.fiscalMonthNo="+i;
-						}
-					//	System.out.print("sql:"+mm.getCalendarTypeName()+":"+sqlMonth);
-						query = entityManager.createQuery(sqlMonth,SysMonth.class);
-						SysMonth month = (SysMonth) query.getResultList().get(0);
-						mm.setMonthID(month.getMonthId());
-						entityManager.persist(mm);
-					}
-				}
-				success = 1;
-				entityManager.flush();
-			}catch(Exception ex){
-				success = 0;
-				System.out.print(ex);
-			}*/
 			return success ;
-		} 
+		}		
+		private Integer updateKpiWeightByKpiId(Integer orgId, Integer kpiId, String kpiWeights){
+			if(kpiWeights != null && kpiWeights != ""){
+				String[] weightsPart = kpiWeights.split("-");
+				Map<String, Double> weightsList = new HashMap<String, Double>();
+				for(String part : weightsPart){
+					weightsList.put("kpiId", 0.00);
+					weightsList.put("kpiWeight", 0.00);
+				}
+			}
+			
+			return 0;
+		}
 		
 		
 		/*--- kpi_result delete (update active = 0) ---*/
