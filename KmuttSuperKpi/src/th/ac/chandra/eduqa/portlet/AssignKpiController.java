@@ -675,9 +675,16 @@ public class AssignKpiController {
 					kpisList.add(Integer.parseInt(part));
 				}
 				
+				String[] weightPart = kpiWeights.split("-");
+				List<String> weightList = new ArrayList<String>();
+				for(String part : weightPart){
+					weightList.add(part);
+				}
+				
 				KpiResultModel kpiResultM = new KpiResultModel();
 				kpiResultM.setOrgId(orgId);
 				kpiResultM.setKpiIds(kpisList);
+				kpiResultM.setKpiWeights(kpiWeights);
 				kpiResultM.setCreatedBy(user.getFullName());
 				kpiResultM.setUpdatedBy(user.getFullName());
 				
@@ -888,6 +895,6 @@ public class AssignKpiController {
 		json.put("lists", lists);
 		//System.out.println(json.toString());
 		response.getWriter().write(json.toString());
-	}
+	}	
 	
 }

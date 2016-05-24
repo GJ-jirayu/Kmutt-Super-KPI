@@ -2492,19 +2492,6 @@ public class EduqaRepository   {
 			}
 			return success ;
 		}		
-		private Integer updateKpiWeightByKpiId(Integer orgId, Integer kpiId, String kpiWeights){
-			if(kpiWeights != null && kpiWeights != ""){
-				String[] weightsPart = kpiWeights.split("-");
-				Map<String, Double> weightsList = new HashMap<String, Double>();
-				for(String part : weightsPart){
-					weightsList.put("kpiId", 0.00);
-					weightsList.put("kpiWeight", 0.00);
-				}
-			}
-			
-			return 0;
-		}
-		
 		
 		/*--- kpi_result delete (update active = 0) ---*/
 		public Integer deleteKpiResultByOrgId(KpiResultModel model){
