@@ -337,13 +337,11 @@
 			/*ทำการหาข้อมูลที่ต้องการ insert (Base - Current)*/
 			var insertVal = [];
 			$.each( currentValArr, function( key, value ) {
-			    var index = $.inArray( value, baseValArr );
-			    if( index == -1 ) {
+			    /*var index = $.inArray( value, baseValArr );
+			    if( index == -1 ) {*/
 			        insertVal.push(value);
-			    }
+			    /*}*/
 			});
-
-			//console.log("deleteVal:"+deleteVal.join("-")+", insertVal:"+insertVal.join("-"));
 
    	 		var orgId = $("#kpiListForm #orgId").val();
 	   	 	$.ajax({
@@ -578,7 +576,7 @@
 								<td class="center">${chandraFn:nl2br(kpi.kpiUomName)}</td>
 								<td class="center" valign="midden">
 									<input id="kpiWeight-${kpi.kpiId}" class="input-mini kpiWeight" type="number" 
-									value="0.00" step="0.25" max="100"/>							
+									value="${kpi.kpiWeight}" step="0.25" max="100"/>							
 								</td>
 								<td class="center">
 									<c:choose>

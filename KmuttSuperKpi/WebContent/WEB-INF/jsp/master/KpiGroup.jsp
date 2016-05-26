@@ -33,7 +33,7 @@
 	<link rel="stylesheet" href="<c:url value="/resources/css/common-element.css"/>" type="text/css"/>
 	
     <script type="text/javascript"> 
-   	  	var dialog,dialog2;
+   	  	var dialog,dialog2,gobalGroupTypeName,gobalGroupTypeStName;
     	$( document ).ready(function() {
     		paging();
     		$('.numPage').val(${PageCur});
@@ -99,8 +99,8 @@
    	 		var dataId = parseInt($(el).parent('td').parent('tr').children('tbody tr td:nth-child(8)').html());
 	    	var dataName = $(el).parent('td').parent('tr').children('tbody tr td:nth-child(3)').text();
 	   	 	$.confirm({
-		   	 	text: "ยืนยันการลบกลุ่มตัวบ่งชี้ \"".concat(dataName, "\""),
-		   	     title: "ลบกลุ่มตัวบ่งชี้",
+		   	 	text: "ยืนยันการลบเป้าประสงค์ \"".concat(dataName, "\""),
+		   	     title: "ลบเป้าประสงค์",
 		   	     confirm: function(button) {		   	    	
 		   	 		$('#kpiGroupForm').attr("action","<%=formActionDelete%>");
 			 		$('#kpiGroupForm '+'#fGroupId').val(dataId);
@@ -127,9 +127,16 @@
    	 		}
    	 	}
    	 	function actSaveEdit(){
-	 		$('#kpiGroupForm').attr("action","<%=formActionEdit%>");
-	 		$('#kpiGroupForm').submit().trigger('reset');
-	 		$('#fGroupStName, #fGroupName').val('');
+   	 		var currentName = $("input#fGroupName").val(); 
+   	 		var currentStName = $("input#fGroupStName").val();
+   	 		if($.trim(gobalGroupTypeName) == $.trim(currentName) 
+   	 			&& $.trim(currentStName) == $.trim(gobalGroupTypeStName)){
+   	 			actCancel();
+   	 		}else{
+   	 			console.log("Saveee");
+   	 			$('#kpiGroupForm').attr("action","<%=formActionEdit%>");
+		 		$('#kpiGroupForm').submit();
+   	 		}	 		
 	 	}
 	 	function actCancel(el){
 	  		//dialog.dialog( "close" );
@@ -151,6 +158,9 @@
 	 			$(d1).find('select#fOrgType').val(valDesc["orgId"]);
 	   			$(d1).find('select#fGroupType').val(valDesc["groupType"]);
 	 		}
+	   		gobalGroupTypeName = valDesc["name"]; 
+	   		gobalGroupTypeStName = valDesc["shortName"];
+
    	 		$(d1).find('span').html(head);
    	 		$(d1).find('input[type=hidden]#fGroupId').val(rowNum);
    	 		$(d1).find('input[type=hidden]#fGroupCreateBy').val(valDesc["createBy"]);
@@ -263,16 +273,16 @@
 			<form:form id="kpiGroupForm" modelAttribute="kpiGroupForm" action="${formAction}" method="POST" enctype="multipart/form-data">
 				<fieldset>
 					<legend style="font:16px bold;">
-						<span></span>กลุ่มตัวบ่งชี้
+						<span></span>เป้าประสงค์
 					</legend>
 					<div style="text-align: center;">
 						<table style="margin:auto">
 							<tr>
-								<td style="text-align:right">ชื่อย่อกลุ่มตัวบ่งชี้ : </td>
+								<td style="text-align:right">ชื่อย่อเป้าประสงค์ : </td>
 								<td><form:input id="fGroupStName" path="kpiGroupModel.groupShortName" maxlength="20"/></td>
 							</tr>
 							<tr>
-								<td style="text-align:right">ชื่อกลุ่มตัวบ่งชี้ : </td>
+								<td style="text-align:right">ชื่อเป้าประสงค์ : </td>
 								<td><form:input id="fGroupName" path="kpiGroupModel.groupName" maxlength="255"/></td>
 							</tr>
 							<tr>
@@ -313,7 +323,7 @@
 		
 		<div class="row-fluid">
 			<div class="span6">
-				<span>ค้นหากลุ่มตัวบ่งชี้ : </span>
+				<span>ค้นหาเป้าประสงค์ : </span>
 				<input type="text" id="textSearch" value="${keySearch}"  placeholder="ค้นหาจากชื่อ" style="margin-bottom: 0px;"/>
 				<img src="<c:url value="/resources/images/search.png"/>" width="20" height="20" onClick="actSearch(this)" style="cursor: pointer;">
 				<img src="<c:url value="/resources/images/add.png"/>" width="18" height="18" onClick="actAdd(this)" style="cursor: pointer;">		
@@ -348,8 +358,8 @@
 				<thead>
 					<tr>
 						<th>ลำดับ</th>
-						<th>ชื่อย่อกลุ่มตัวบ่งชี้</th>
-						<th>ชื่อกลุ่มตัวบ่งชี้</th>
+						<th>ชื่อย่อเป้าประสงค์</th>
+						<th>ชื่อเป้าประสงค์</th>
 						<th>ประเภทหน่วยงาน</th>
 						<th>ประเภทกลุ่มตัวบ่งชี้</th>												
 						<th>แก้ไข</th>
@@ -419,4 +429,3 @@
 
 </body>
 </html>	
-   

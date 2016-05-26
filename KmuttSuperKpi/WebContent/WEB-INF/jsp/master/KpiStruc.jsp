@@ -44,7 +44,7 @@
 	<script src="<c:url value="/resources/js/confirm-master/jquery.confirm.min.js"/>"></script>
 	
     <script type="text/javascript"> 
-   	  	var dialog,dialog2;
+   	  	var dialog,dialog2, gobalStucName, gobalGroupVal, gobalCriVal;
     	$( document ).ready(function() {
     		setDefault();
     		paging();
@@ -121,8 +121,8 @@
    	 		var dataId = parseInt($(el).parent('td').parent('tr').children('tbody tr td:nth-child(7)').html());
 	    	var dataName = $(el).parent('td').parent('tr').children('tbody tr td:nth-child(2)').text();
 	   	 	$.confirm({
-		   	     text: "ยืนยันการลบองค์ประกอบ \"".concat(dataName, "\""),
-		   	     title: "ลบองค์ประกอบ",
+		   	     text: "ยืนยันการลบ Super KPI  \"".concat(dataName, "\""),
+		   	     title: "ลบ Super KPI ",
 		   	     confirm: function(button) {		   	    	
 		   	 		$('#kpiStrucForm').attr("action","<%=formActionDelete%>");
 			 		$('#kpiStrucForm '+'#fStrucId').val(dataId);
@@ -145,17 +145,21 @@
    	 		}else{
 	   	 		$('#kpiStrucForm').attr('action',"<%=formActionInsert%>");   	 		
 	   	 		$("#fGroupId").val($('#fGroupType').val());
-	   	 		$('#kpiStrucForm').submit().trigger('reset');
-	   	 		$('#fStrucName').val('');
+	   	 		$('#kpiStrucForm').submit();
    	 		}
    	 	}
    	 	function actSaveEdit(){
-	 		$('#kpiStrucForm').attr("action","<%=formActionEdit%>");
-	 		$('#kpiStrucForm').submit().trigger('reset');
-	 		$('#fStrucName').val('');
+   	 		if($.trim(gobalStucName) == $.trim($("input#fStrucName").val())
+   	 			&& $.trim(gobalGroupVal) == $.trim($("select#fGroupType").val())
+   	 			&& $.trim(gobalCriVal) == $.trim($("form#kpiStrucForm input[type=radio]:checked").val()) ){
+   	 			actCancel();
+   	 		}else{
+		 		$('#kpiStrucForm').attr("action","<%=formActionEdit%>");
+		 		$("#fGroupId").val($('#fGroupType').val());
+		 		$('#kpiStrucForm').submit();
+   	 		}
 	 	}
 	 	function actCancel(el){
-	  		//dialog.dialog( "close" );
 	  		$('#fStrucName').val("");
 	  		$('#formActStruc').slideToggle('slow');     	  		
 	  	}
@@ -176,6 +180,10 @@
 	 			$(d1).find('input[type=text]#fStrucName').val(dataDesc["name"]);
 	 			$(d1).find('select#fGroupType').val(dataDesc["groupID"]);
 	 			$("#ST"+dataDesc["typeID"]).prop('checked', true);
+	 			gobalStucName = dataDesc["name"];
+	 			gobalGroupVal = dataDesc["groupID"];
+	 			gobalCriVal = dataDesc["typeID"];
+
 	 		}
    	 		$(d1).find('span').html(head);
    	 		$(d1).find('input[type=hidden]#fStrucId').val(dataId);
@@ -239,8 +247,8 @@
    		}   		
    		table.tableGridTp th:nth-child(1){ width:10%; }
    		table.tableGridTp th:nth-child(2){ width:40%; }
-   		table.tableGridTp th:nth-child(3){ width:15%; }
-   		table.tableGridTp th:nth-child(4){ width:15%; }
+   		table.tableGridTp th:nth-child(3){ width:10%; }
+   		table.tableGridTp th:nth-child(4){ width:20%; }
    		table.tableGridTp th:nth-child(5){ width:10%; }
    		table.tableGridTp th:nth-child(6){ width:10%; }
    		table.tableGridTp th:nth-child(7), table.tableGridTp td:nth-child(7){ width:0%; display:none;}
@@ -286,7 +294,7 @@
 			<form:form id="kpiStrucForm" modelAttribute="kpiStrucForm" action="${formAction}" method="POST" enctype="multipart/form-data">
 				<fieldset>
 					<legend style="font:16px bold;">
-						<span></span>องค์ประกอบ
+						<span></span> Super KPI 
 					</legend>
 					<div style="text-align: center;">
 						<form:input type="hidden" id="pageNo" path="pageNo" value="${PageCur}"/>
@@ -299,13 +307,13 @@
 						
 						<table style="margin:auto"> 
 							<tr>
-								<td style="text-align:right">เกณฑ์องค์ประกอบ : </td>
+								<td style="text-align:right">ชื่อ Super KPI :</td>
 								<td style="text-align:left">
 									<form:input id="fStrucName" path="kpiStrucModel.strucName" maxlength="255"/> (ตัวอักษร)
 								</td>
 							</tr>
 							<tr>
-								<td style="text-align:right">กลุ่มตัวบ่งชี้ : </td>
+								<td style="text-align:right">เป้าประสงค์ : </td>
 								<td style="text-align:left">
 									<select id="fGroupType" >
 										<c:forEach items="${groups}" var="group" varStatus="loop">
@@ -315,7 +323,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td style="text-align: right">เกณฑ์องค์ประกอบ :</td>
+								<td style="text-align: right">เกณฑ์ :</td>
 								<td style="display: inline-block;"><c:forEach
 										items="${strucTypes}" var="type" varStatus="loop">
 										<form:radiobutton id="ST${type.strucTypeId}" class="ST${loop.count}"
@@ -337,7 +345,7 @@
 		
 		<div class="row-fluid">
 			<div class="span3">
-				<span>กลุ่มตัวบ่งชี้</span>
+				<span>เป้าประสงค์</span>
 				<select id="filterGroup" onchange="changeKpiGroup(this)" style="width:100px;">
 					<c:forEach items="${groups}" var="group" varStatus="loop">
 						<option value="${group.groupId}">${group.groupShortName}</option>
@@ -345,7 +353,7 @@
 				</select>
 			</div>
 			<div class="span6">
-				<span>ค้นหาองค์ประกอบ : </span>
+				<span>ค้นหา Super KPI  : </span>
 				<input type="text" id="textSearch" value="${keySearch}"  placeholder="ค้นหาจากชื่อ" style="margin-bottom: 0px;"/>
 					<img src="<c:url value="/resources/images/search.png"/>" width="20" height="20" onClick="actSearch(this)" style="cursor: pointer;">
 					<img src="<c:url value="/resources/images/add.png"/>" width="18" height="18" onClick="actAdd(this)" style="cursor: pointer;">	
@@ -380,9 +388,9 @@
 				<thead>
 					<tr>
 						<th>ลำดับ</th>						
-						<th>ชื่อองค์ประกอบ</th>
-						<th>เกณฑ์องค์ประกอบ</th>
-						<th>กลุ่มตัวบ่งชี้</th>			
+						<th>ชื่อ Super KPI </th>
+						<th>เกณฑ์</th>
+						<th>เป้าประสงค์</th>			
 						<th>แก้ไข</th>
 						<th>ลบ</th>
 						<th>รหัส(ซ้อน)</th>
@@ -447,5 +455,4 @@
 		
 	</div>
 </body>
-</html>	
-   
+</html>

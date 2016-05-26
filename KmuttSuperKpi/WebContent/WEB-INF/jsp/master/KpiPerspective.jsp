@@ -26,8 +26,9 @@
 	<script src="<c:url value="/resources/js/confirm-master/jquery.confirm.min.js"/>"></script>	
 	<link rel="stylesheet" href="<c:url value="/resources/css/common-element.css"/>" type="text/css"/>
 	
-    <script type="text/javascript">
+    <script type="text/javascript">    	
     	$( document ).ready(function() {
+    		var gobalPerName;
     		paging();
     		$('#numPage').val(${PageCur});
     		$('select.pageSize').val(${pageSize});
@@ -87,8 +88,8 @@
    	 		var dataId = parseInt($(el).parent('td').parent('tr').children('tbody tr td:nth-child(2)').html());
 	    	var dataName = $(el).parent('td').parent('tr').children('tbody tr td:nth-child(3)').text();
 	   	 	$.confirm({
-		   	     text: "ยืนยันการลบระดับตัวบ่งชี้ \"".concat(dataName, "\""),
-		   	     title: "ลบระดับตัวบ่งชี้",
+		   	     text: "ยืนยันการลบมุมมองตัวบ่งชี้ \"".concat(dataName, "\""),
+		   	     title: "ลบมุมมองตัวบ่งชี้",
 		   	     confirm: function(button) {		   	    	
 		   	 		$('#kpiPerspectiveForm').attr("action","<%=formActionDelete%>");
 			 		$('#kpiPerspectiveForm '+'#fPerspectiveId').val(dataId);
@@ -115,8 +116,12 @@
    	 		}
    	 	}
    	 	function actSaveEdit(){
-	 		$('#kpiPerspectiveForm').attr("action","<%=formActionEdit%>");
-	 		$('#kpiPerspectiveForm').submit();
+   	 		if($.trim(gobalPerName) == $.trim($("input#fPerspectiveDesc").val())){
+   	 			actCancel();
+   	 		}else{
+   	 			$('#kpiPerspectiveForm').attr("action","<%=formActionEdit%>");
+	 			$('#kpiPerspectiveForm').submit();
+   	 		}	 		
 	 	}
 	 	function actCancel(el){
 	  		//dialog.dialog( "close" );
@@ -136,8 +141,8 @@
 	 		}else if(mode==2){
 	 			head = 'แก้ไข';
 	 			event='actSaveEdit()';
+	 			gobalPerName = value;
 	 		}
-
    	 		$(d1).find('span').html(head);
    	 		$(d1).find('input[type=hidden]#fPerspectiveId').val(rowNum);
    	 		$(d1).find('input[type=hidden]#fPerspectivecreateBy').val(createBy);
@@ -182,7 +187,7 @@
         		$('#kpiPerspectiveForm').attr("action","<%=formActionListPage%>");
         		$('#kpiPerspectiveForm').submit();
         	}
-        }
+		}
    	</script>  
   
    	<style type="text/css">
@@ -362,4 +367,3 @@
 
 </body>
 </html>	
-   

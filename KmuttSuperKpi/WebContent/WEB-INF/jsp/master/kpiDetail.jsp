@@ -1,6 +1,7 @@
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 <%@ page contentType="text/html; charset=utf-8" %> 
 <%@ page import="javax.portlet.PortletURL"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <portlet:actionURL var="formActionInsert">
 	<portlet:param name="action" value="doInsertKpi"/>
@@ -24,6 +25,7 @@
 <portlet:resourceURL var="requestCriteriaGroupDetail" id="requestCriteriaGroupDetail" ></portlet:resourceURL>
 <portlet:resourceURL var="listCds" id="listCds" ></portlet:resourceURL>
 <portlet:resourceURL var="doGetCriteraiMethod" id="doGetCriteraiMethod" ></portlet:resourceURL>
+<portlet:resourceURL var="doGetSuperKpi" id="doGetSuperKpi" ></portlet:resourceURL>
 <portlet:resourceURL var="doDeleteKpiChildTable" id="doDeleteKpiChildTable" ></portlet:resourceURL>
 
 
@@ -88,25 +90,11 @@
 	        validateNumber();
 	        validateInteger();
 	        pageMessage();
-	   /*     sctabs.delegate( "span.ui-icon-close", "click", function() {
-	            if(sctabs.find("ul li").length > 1 ){
-		            var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
-		            $( "#" + panelId ).remove();
-		            sctabs.tabs( "refresh" );
-	            }
-	          });
-	        rctabs.delegate( "span.ui-icon-close", "click", function() {
-	            if(rctabs.find("ul li").length > 1 ){
-		            var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
-		            $( "#" + panelId ).remove();
-		            rctabs.tabs( "refresh" );
-	            }
-	          });*/
-	          //blind criterieType // quan or qual
-	          //bind event
+
 	       	scoreNumChangeEvent();
 	       	$("#criteriaTypeStr").val($("#criteriaMethod").val());
 	       	getCriteraiMethod();
+	       	getSuperKpi();
 	    });
 
 	    function pageMessage(){
@@ -694,14 +682,8 @@
     		{
         		$('input#radioCriteriaScore1').attr('checked', true);
         		$('#radioCriteriaScore2').prop("disabled",true);
-        		//$('select#criteriaMethod option').prop("disabled",false);
-        		//$('select#criteriaMethod option[value="1"]').prop("disabled",true);
-        		//$('select#criteriaMethod option[value="2"]').prop("disabled",true);
     		}else{
     			$('#radioCriteriaScore2').prop("disabled",false);
-    			//$('select#criteriaMethod option').prop("disabled",false);
-    			//$('select#criteriaMethod option[value="3"]').prop("disabled",true);
-        		//$('select#criteriaMethod option[value="4"]').prop("disabled",true);
     		}
 
     		getCriteraiMethod();
@@ -1337,6 +1319,22 @@
 				cnt.append(li);
 			}
 		}
+
+		function getSuperKpi(){
+			var baseVal = $("#detailGroup").val();
+			var traget = $("#detailStructure").empty();
+			$.ajax({
+				dataType:'json',
+				url:"<%=doGetSuperKpi%>",
+				data:{'kpiGroupId':baseVal },
+				async:false,
+				success: function(data){
+					for(var i=0;i<data["lists"].length;i++){
+						traget.append('<option value="'+data["lists"][i]["id"]+'"> '+data["lists"][i]["name"]+' </option>');
+					} 
+				}
+			});
+		}
     </script>
     <style type="text/css">
     	table.tableKpiDetail,table.tableKpiCriteria{ width:100%;}
@@ -1427,6 +1425,7 @@
 		<div id="kpi-Detail" class="boxPadding">
 		   	<form:form  id="kpiFormDetail" modelAttribute="kpiForm" method="post"  name="kpiForm" action="${formActionNew}" enctype="multipart/form-data">
 			<form:input type="text" id="kpiId" path="kpiModel.kpiId" style="display:none"/>
+
 			<table class="tableKpiDetail">
 				<tr>
 					<td colspan="2"> 
@@ -1441,97 +1440,164 @@
 					</td>
 				</tr>
 				<tr>
-					<td><label>ระดับตัวบ่งชี้</label><form:select id="detailLevel"  path="kpiModel.levelId" 
-					items="${levelList}" class="Required"/></td>
-					<td><label>องค์ประกอบ</label> <form:select id="detailStructure"  path="kpiModel.structureId" items="${structureList}" /></td>
-				</tr>
-				<tr>
-					<td><label>กลุ่มตัวบ่งชี้</label><form:select id="detailGroup"  path="kpiModel.groupId" 
-					items="${groupList}" class="Required"/></td>
-					<td><label>ชนิดตัวบ่งชี้</label><form:select id="detailType" path="kpiModel.typeId" 
-					items="${typeList}" class="Required"/></td>
-				</tr>
-				<tr>
-					<td colspan="2"> 
-						<label> มุมมองตัวบ่งชี้</label>
+					<td>
+						<label>ระดับตัวบ่งชี้</label><form:select id="detailLevel"  path="kpiModel.levelId" 
+						items="${levelList}" class="Required"/></td>
+					<td>
+						<label> มุมมอง (ฺBSC)</label>
 						<form:select id="detailPerspective" path="kpiModel.kpiPerspectiveId" 
 						items="${kpiPerspectiveList}" class="Required"/>
 					</td>
 				</tr>
 				<tr>
-					<td><label>ประเภทปฏิทิน</label><form:select id="detailCalendarType"  path="kpiModel.calendarTypeId" items="${calendarTypeList}" /></td>
-					<td> <label>ช่วงเวลา </label> <form:select id="detailPeriod"  path="kpiModel.periodId" 
-					items="${periodList}" class="Required"/> </td>
+					<td>
+						<label>เป้าประสงค์</label><form:select id="detailGroup" class="input-xlarge Required" path="kpiModel.groupId" 
+						items="${groupList}" onchange="getSuperKpi()"/>
+					</td>
+					<td>
+						<label>Super KPI</label> <form:select id="detailStructure" class="input-xlarge Required" path="kpiModel.structureId" items="${structureList}" />
+					</td>
 				</tr>
 				<tr>
-					<td><label>หน่วยวัด </label><form:select id="detailUom" path="kpiModel.uomId" 
-					items="${uomList}" class="Required"/></td>	
-					<td><label>ภายใต้ตัวบ่งชี้</label> <form:select id="detailParent"  path="kpiModel.parentId" items="${ parentList}" />
-					<img height="24" width="24" style="cursor: pointer" src="<c:url value="/resources/images/refresh-rect-bw.png"/>" onclick="getKpiParentList()" />
-					<img height="24" width="24" style="display:none;" src="<c:url value="/resources/images/loading_blue_32.gif"/>" />
+					<td colspan="2">
+						<label>ชนิดตัวบ่งชี้</label><form:select id="detailType" path="kpiModel.typeId" items="${typeList}" class="Required"/>						
+					</td>
 				</tr>
 				<tr>
-					<td> <label>ค่าเปรียบเทียบ</label> <form:input type="text" class="numbersOnly" id="detailBenchmark" path="kpiModel.benchmark" /> (ตามหน่วยวัด)</td>
-					<td> <label>ค่าคะแนนต่ำสุด</label> <form:input type="text" class="numbersOnly" id="detailMinScore" path="kpiModel.minScore" style="width:30px" /></td>
+					<td>
+						<label>ประเภทปฏิทิน</label><form:select id="detailCalendarType"  path="kpiModel.calendarTypeId" items="${calendarTypeList}" /></td>
+					<td> 
+						<label>ช่วงเวลา </label> <form:select id="detailPeriod"  path="kpiModel.periodId" items="${periodList}" class="Required"/> 
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>หน่วยวัด </label><form:select id="detailUom" path="kpiModel.uomId" items="${uomList}" class="Required"/>
+					</td>	
+					<td>
+						<label>ภายใต้ตัวบ่งชี้</label>
+						<!-- <form:select id="detailParent"  path="kpiModel.parentId" items="${parentList}"/> -->
+						<form:select id="detailParent"  path="kpiModel.parentId" class="Nossss">
+							<!-- <form:options items="${parentList}" title="${parentList}"/> -->
+							<c:forEach items="${parentList}" var="parent">
+								<option 
+									value="${parent.key}" 
+									title="${fn:substring(parent.value, fn:indexOf(parent.value, ":")+1, fn:length(parent.value))}"> 
+									${fn:substring(parent.value, 0, fn:indexOf(parent.value, ":"))}
+								</option>
+							</c:forEach>
+						</form:select>
+						<img height="24" width="24" style="cursor: pointer" src="<c:url value="/resources/images/refresh-rect-bw.png"/>" onclick="getKpiParentList()" />
+						<img height="24" width="24" style="display:none;" src="<c:url value="/resources/images/loading_blue_32.gif"/>" />
+					</td>
+				</tr>
+				<tr>
+					<td> 
+						<label>ค่าเปรียบเทียบ</label> <form:input type="text" class="numbersOnly" id="detailBenchmark" path="kpiModel.benchmark" /> (ตามหน่วยวัด)
+					</td>
+					<td> 
+						<label>ค่าคะแนนต่ำสุด</label> <form:input type="text" class="numbersOnly" id="detailMinScore" path="kpiModel.minScore" style="width:30px" />
+					</td>
 				</tr>				
 			</table>
 
 			<table class="tableKpiCriteria"> 
-				<tr><td><label>ประเภทเกณฑ์ประเมิน</label> <form:select id="criteriaTypeId" onchange="criteriaTypeChange()" path="kpiModel.criteriaTypeId" items="${criteriaTypeList}" /></td>
+				<tr>
+					<td>
+						<label>ประเภทเกณฑ์ประเมิน</label> <form:select id="criteriaTypeId" onchange="criteriaTypeChange()" path="kpiModel.criteriaTypeId" items="${criteriaTypeList}" />
+					</td>
 				</tr>
-				<tr><td><label>เกณฑ์คะแนน</label>
-					<form:radiobutton id="radioCriteriaScore1" name="radioCriteriaScore" path="radioCriteriaScore" value="integer" />  เทียบคะแนนเต็มเท่ากับร้อยละ <form:input id="criteriaScore" path="kpiModel.criteriaScore" type="text" style="width:30px" class="numbersOnly"/>
-						&nbsp<form:radiobutton id="radioCriteriaScore2" name="radioCriteriaScore" path="radioCriteriaScore" value="pass"/> ผ่าน/ไม่ผ่าน</td>
+				<tr>
+					<td>
+						<label>เกณฑ์คะแนน</label>
+						<form:radiobutton id="radioCriteriaScore1" name="radioCriteriaScore" path="radioCriteriaScore" value="integer" />  เทียบคะแนนเต็มเท่ากับร้อยละ <form:input id="criteriaScore" path="kpiModel.criteriaScore" type="text" style="width:30px" class="numbersOnly"/> &nbsp
+						<form:radiobutton id="radioCriteriaScore2" name="radioCriteriaScore" path="radioCriteriaScore" value="pass"/> ผ่าน/ไม่ผ่าน
+					</td>
 				</tr>
-				<tr><td><label>วิธีการประเมิน</label><form:select id="criteriaMethod" class="input-large" onchange="toggleBaselineLayout()"   path="kpiModel.criteriaMethodId" items="${criteriaMethodList}" /></td>
+				<tr>
+					<td>
+						<label>วิธีการประเมิน</label><form:select id="criteriaMethod" class="input-large" onchange="toggleBaselineLayout()"   path="kpiModel.criteriaMethodId" items="${criteriaMethodList}" />
+					</td>
 				</tr>
-				<tr style="display:none;"> <td> <form:input type="text" path="kpiModel.createdBy" /> </td> </tr>
-				<tr style="display:none;"> <td> <form:input type="text" path="kpiModel.createdDate" /> </td> </tr>
-			</table>			
-			<div style="text-align:center;"><input onClick="verifyDataOnSubmit()" type="button" class="save" value="บันทึก" style="{margin-right:10px;}" /> <input type="button" class="cancel" onClick="doBack2List()" value="ยกเลิก" /> 
+				<tr style="display:none;"> 
+					<td> <form:input type="text" path="kpiModel.createdBy" /> </td> 
+				</tr>
+				<tr style="display:none;"> 
+					<td> <form:input type="text" path="kpiModel.createdDate" /> </td> 
+				</tr>
+			</table>
+
+			<div style="text-align:center;">
+				<input onClick="verifyDataOnSubmit()" type="button" class="save" value="บันทึก" style="{margin-right:10px;}" />
+				<input type="button" class="cancel" onClick="doBack2List()" value="ยกเลิก" /> 
 			</div>
-			</form:form>
-		</div> <!--  end detail box --> 
-		<div id="accordionStateMessage" style="{text-align:center;color:red}"></div>
+			</form:form>			
+		</div> <!--  end detail box -->
+
+		<div id="accordionStateMessage" style="{text-align:center;color:red}"> <!-- Generate by Javascript --></div>
 		<div id="accordion" class="eduqa-kpi-calc">
 			<h3>เกณฑ์มาตราฐาน/เกณฑ์ประเมิน</h3>
 			<div class="kpi-criteria">
-				<form:form  id="kpiFormCriteria" modelAttribute="kpiForm" method="post"  name="kpiForm" action="${formActionNew}" enctype="multipart/form-data">
-				 <table class="tableKpiCriteria2"> 
-					<tr id="standardCriteriaCnt" >
-						<td>เกณฑ์มาตราฐาน</td><td></td>
-					</tr>	
-					<tr id="resultCriteriaCnt">
-						<td>เกณฑ์แปลงคะแนน</td><td></td>
-					</tr>
-				</table>
+				<form:form  id="kpiFormCriteria" modelAttribute="kpiForm" method="post"  name="kpiForm" action="{formActionNew}" enctype="multipart/form-data">
+					<table class="tableKpiCriteria2"> 
+						<tr id="standardCriteriaCnt" >
+							<td>เกณฑ์มาตราฐาน</td><td></td>
+						</tr>	
+						<tr id="resultCriteriaCnt">
+							<td>เกณฑ์แปลงคะแนน</td><td></td>
+						</tr>
+					</table>
 				</form:form>
+
 				<div id="criteriaTemplate" class="template" style="display:none">
 					<div id="standard" class="templateItem">
 						<div class="tabAction">
 							<input type="button" class="btn_clearType" onClick="actStdCrAdd(this)" value="เพิ่มเกณฑ์"/>
 							<div id="actCrDetail" class="actionCnt">
 								<table>
-									<tr><td>ข้อ</td><td></td></tr>
-									<tr><td>เกณฑ์มาตราฐาน</td><td><textarea style="width:90%"  rows="3"></textarea></td></tr>
-									<tr><td>กลุ่ม </td><td><select id="crGroup" onchange="crGroupChange(this,'crGroupItem')">
-														<c:if test="${not empty criteriaGroupList}"> 
-       														<c:forEach items="${criteriaGroupList}" var="cgroup" varStatus="loop">
-       															<option value="${cgroup.key}">${cgroup.value}</option>
-															</c:forEach>
-														</c:if></select>
-														<select id="crGroupItem">
-														<c:if test="${not empty criteriaGroupDetailList}"> 
-       														<c:forEach items="${criteriaGroupDetailList}" var="detail" varStatus="loop">
-       															<option value="${detail.key}">${detail.value}</option>
-															</c:forEach>
-														</c:if></select></td>
+									<tr> 
+										<td>ข้อ</td>
+										<td></td>
 									</tr>
-									<tr><td>ข้อมูลพื้นฐาน </td><td><input type="text"/></td></tr>
-									<tr style="display:none;"><td>รหัส</td><td></td></tr>
-									<tr><td> </td><td><input type="button" class="btnAdd save" onClick="addStdCr()" value="เพิ่ม"/>
-										<input type="button" class="btnEdit save" onClick="editStdCr()" value="แก้ไข" />
-										<input type="button" class="cancel" onClick="hideCriteriaGroup('actCrDetail')" value="ยกเลิก"/></td></tr>
+									<tr>
+										<td>เกณฑ์มาตราฐาน</td>
+										<td><textarea style="width:90%"  rows="3"></textarea></td>
+									</tr>
+									<tr>
+										<td>กลุ่ม </td>
+										<td>
+											<select id="crGroup" onchange="crGroupChange(this,'crGroupItem')">
+												<c:if test="${not empty criteriaGroupList}"> 
+       											<c:forEach items="${criteriaGroupList}" var="cgroup" varStatus="loop">
+       												<option value="${cgroup.key}">${cgroup.value}</option>
+												</c:forEach>
+												</c:if>
+											</select>
+											<select id="crGroupItem">
+												<c:if test="${not empty criteriaGroupDetailList}"> 
+       											<c:forEach items="${criteriaGroupDetailList}" var="detail" varStatus="loop">
+       												<option value="${detail.key}">${detail.value}</option>
+												</c:forEach>
+												</c:if>
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<td>ข้อมูลพื้นฐาน </td>
+										<td><input type="text"/></td>
+									</tr>
+									<tr style="display:none;">
+										<td>รหัส</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td> </td>
+										<td>
+											<input type="button" class="btnAdd save" onClick="addStdCr()" value="เพิ่ม"/>
+											<input type="button" class="btnEdit save" onClick="editStdCr()" value="แก้ไข" />
+											<input type="button" class="cancel" onClick="hideCriteriaGroup('actCrDetail')" value="ยกเลิก"/>
+										</td>
+									</tr>
 								</table>
 							</div>
 						</div>
@@ -1539,6 +1605,7 @@
 							<ul class="tabsList"></ul>
 						</div>
 					</div>
+
 					<div id="baseline"  class="templateItem">
 						<div class="tabAction">
 							<input type="button" class="btn_clearType" onClick="showCriteriaGroup(this,'actQuanGroup',0)" value="เพิ่มกลุ่ม.."/>

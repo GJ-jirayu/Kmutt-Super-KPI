@@ -684,20 +684,21 @@ public class AssignKpiController {
 				KpiResultModel kpiResultM = new KpiResultModel();
 				kpiResultM.setOrgId(orgId);
 				kpiResultM.setKpiIds(kpisList);
-				kpiResultM.setKpiWeights(kpiWeights);
+				kpiResultM.setKpiWeights(weightList);
 				kpiResultM.setCreatedBy(user.getFullName());
 				kpiResultM.setUpdatedBy(user.getFullName());
 				
 				ResultService rsDel = service.saveResultOfOrg(kpiResultM);
 				if(!rsDel.isError()){
 					insertStatusCode = 1;
-					insertStatusDesc = "บันทึกข้อมูล kpi_result ที่มี kpi_id in("+insertKpis+") เสร็จสิ้น";
+					insertStatusDesc = "บันทึกข้อมูล kpi_result ที่มี kpi_id:"+insertKpis+" เสร็จสิ้น";
 				}else{
 					insertStatusCode = 0;
 					insertStatusDesc = rsDel.getMsgDesc();
 				}
 			}else{
 				insertStatusCode = 1;
+				insertStatusDesc = "insertKpis is null.";
 			}
 			
 			//ตรวจสอบการทำงานในส่วนการลบ และบันทึก

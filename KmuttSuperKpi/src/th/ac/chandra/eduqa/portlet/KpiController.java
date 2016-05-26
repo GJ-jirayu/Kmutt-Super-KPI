@@ -942,6 +942,7 @@ public class KpiController {
 		
 		DescriptionModel descriptionModel = new DescriptionModel();
 		descriptionModel.setGroupId(criteraiTypeId);
+		@SuppressWarnings("unchecked")
 		List<DescriptionModel> crMthods = service.getCriMethods(descriptionModel);
 		JSONArray lists = JSONFactoryUtil.createJSONArray();
 		for(DescriptionModel crMethod: crMthods){
@@ -954,6 +955,29 @@ public class KpiController {
 		response.getWriter().write(json.toString());
 	}
 	
+	@ResourceMapping(value="doGetSuperKpi")
+	@ResponseBody 
+	public void doGetSuperKpi(ResourceRequest request,ResourceResponse response) 
+			throws IOException{
+		HttpServletRequest httpReq = PortalUtil.getHttpServletRequest(request);
+		HttpServletRequest normalRequest	=	PortalUtil.getOriginalServletRequest(httpReq);		
+		JSONObject json = JSONFactoryUtil.createJSONObject();
+		Integer kpiGroupId = Integer.parseInt(normalRequest.getParameter("kpiGroupId"));
+		
+		KpiStrucModel kst = new KpiStrucModel();
+		kst.setPaging(new Paging());
+		kst.setGroupId(kpiGroupId);
+		List<KpiStrucModel> strucs = service.searchKpiStruc(kst);
+		JSONArray lists = JSONFactoryUtil.createJSONArray();
+		for(KpiStrucModel crStrucs: strucs){
+			JSONObject connJSON = JSONFactoryUtil.createJSONObject();
+         	connJSON.put("id", crStrucs.getStrucId());
+         	connJSON.put("name", crStrucs.getStrucName());
+         	lists.put(connJSON);
+        }
+		json.put("lists", lists);
+		response.getWriter().write(json.toString());
+	}
 	
 	@ResourceMapping(value="doDeleteKpiChildTable")
 	@ResponseBody 
