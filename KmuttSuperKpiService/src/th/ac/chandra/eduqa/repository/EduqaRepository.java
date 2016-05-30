@@ -267,12 +267,11 @@ public class EduqaRepository   {
 			Query query = entityManager.createNativeQuery(
 					" SELECT g.kpi_group_id,g.academic_year "+
 					" ,g.kpi_group_name,g.kpi_group_short_name "+
-					" ,o.org_type_id,o.org_type_name "+
+					" ,'0' ,'Org Name' "+
 					" ,t.kpi_group_type_id, t.kpi_group_type_name "+
 					" ,g.created_by,g.created_dttm "+
-					" FROM kpi_group g, org_type o, kpi_group_type t "+
-					" where o.org_type_id = g.org_type_id "+
-					" and t.kpi_group_type_id = g.kpi_group_type_id "+ 
+					" FROM kpi_group g, kpi_group_type t "+
+					" where t.kpi_group_type_id = g.kpi_group_type_id "+ 
 					sbGrp.toString()+
 					" order by g.kpi_group_id");
 			query.setFirstResult((pagging.getPageNo()-1) * pagging.getPageSize()); 
@@ -286,7 +285,7 @@ public class EduqaRepository   {
 				group.setAcademicYear((Integer) result[1]);
 				group.setGroupName((String) result[2]);
 				group.setGroupShortName((String) result[3]);
-				group.setOrgTypeId((Integer) result[4]);
+				group.setOrgTypeId(Integer.parseInt(result[4].toString()));
 				group.setOrgTypeName((String) result[5]);
 				group.setGroupTypeId((Integer) result[6]);
 				group.setGroupTypeName((String) result[7]);
@@ -299,9 +298,8 @@ public class EduqaRepository   {
 			
 			query = entityManager.createNativeQuery(
 					"SELECT count(*) "+
-					"FROM kpi_group g, org_type o, kpi_group_type t "+
-					"where o.org_type_id = g.org_type_id "+
-					"and t.kpi_group_type_id = g.kpi_group_type_id "+ 
+					"FROM kpi_group g, kpi_group_type t "+
+					"where t.kpi_group_type_id = g.kpi_group_type_id "+ 
 					sbGrp.toString());
 			BigInteger count = (BigInteger) query.getSingleResult();
 			transList.add(String.valueOf(count));
@@ -497,13 +495,13 @@ public class EduqaRepository   {
 			String keySearch) throws DataAccessException {
 		StringBuffer sb = new StringBuffer("");
 		if (keySearch != null && keySearch.trim().length() > 0) {
-			sb.append(" where  p.uomName like '%" + keySearch.trim() + "%' ");
+			sb.append(" where p.uomName like '%" + keySearch.trim() + "%' ");
 		}
 		ArrayList transList = new ArrayList();
 		Query query = entityManager.createQuery(
 				" select p from KpiUom p " + sb.toString(), KpiUom.class);
 		query.setFirstResult((pagging.getPageNo() - 1) * pagging.getPageSize());
-		query.setMaxResults(pagging.getPageSize());
+		//query.setMaxResults(pagging.getPageSize());
 		transList.add(query.getResultList());
 		query = entityManager.createQuery("select count(p) from KpiUom p "
 				+ sb.toString());
@@ -992,7 +990,7 @@ public class EduqaRepository   {
 		+ " left join kpi_uom um on kpi.kpi_uom_id = um.kpi_uom_id "  
 		+ " left join kpi_perspective kp on kp.kpi_perspective_id = kpi.kpi_perspective_id "
 		+ sb.toString() 
-		+" order by kpi.kpi_structure_id,kpi.kpi_name ";
+		+" order by g.kpi_group_name, kpi.kpi_code ";
 		Query query =  entityManager.createNativeQuery(sql);
 		query.setFirstResult((pagging.getPageNo()-1) * pagging.getPageSize()); 
 		query.setMaxResults(pagging.getPageSize());	
@@ -3051,7 +3049,9 @@ public class EduqaRepository   {
 	}
 	public List getCriteriaTypeAll(DescriptionModel model)	throws DataAccessException {
 		List returns = new ArrayList();
-		Query query = entityManager.createNativeQuery("SELECT criteria_type_id,criteria_type_name FROM eduqa.criteria_type;");
+		Query query = entityManager.createNativeQuery(
+				"SELECT criteria_type_id, criteria_type_name FROM eduqa.criteria_type "
+				);
 		List<Object[]> results = query.getResultList();
 		for(Object[] result: results){
 			DescriptionModel mod = new DescriptionModel();

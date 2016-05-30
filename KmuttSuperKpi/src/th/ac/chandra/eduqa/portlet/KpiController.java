@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
@@ -131,6 +132,7 @@ public class KpiController {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	@RequestMapping("VIEW")
 	@RenderMapping(params="render=showDetail")
 	public String showDetail(PortletRequest request,Model model, @RequestParam("actionStatus") String actionStatus){
@@ -206,7 +208,8 @@ public class KpiController {
 		for(DescriptionModel crType: crTypes){
 			criteriaTypeList.put(crType.getDescCode(),crType.getDescription());
 		}
-		model.addAttribute("criteriaTypeList", criteriaTypeList);
+		Map<String, String> criteriaTypeListSortedMap = new TreeMap<String, String>(criteriaTypeList);
+		model.addAttribute("criteriaTypeList", criteriaTypeListSortedMap);
 		
 		Map<String,String> criteriaMethodList = new HashMap<String,String>();
 		List<DescriptionModel> crMthods = service.getCriMethods(new DescriptionModel());

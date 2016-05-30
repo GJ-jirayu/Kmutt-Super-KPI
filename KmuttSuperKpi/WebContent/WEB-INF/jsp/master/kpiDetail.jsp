@@ -2,7 +2,9 @@
 <%@ page contentType="text/html; charset=utf-8" %> 
 <%@ page import="javax.portlet.PortletURL"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-
+<portlet:actionURL var="actionNew">
+	<portlet:param name="action" value="doNew"/>
+</portlet:actionURL>
 <portlet:actionURL var="formActionInsert">
 	<portlet:param name="action" value="doInsertKpi"/>
 </portlet:actionURL> 
@@ -52,6 +54,8 @@
     <script type="text/javascript"> 
 		var portletBoxName = "kpiDetail";
 		var standardCriteriaId = 2;
+		var informationChanged = false;
+		var levelId, calendarTypeId, periodId, criteriaTypeId, criteriaMethodId, radioCriteriaScore
 	    $(function() {
 	    	 $(".actionCnt div").hide();
 	    	 $( "#accordion" ).accordion({ active:false,collapsible:true,autoHeight: false ,
@@ -93,8 +97,21 @@
 
 	       	scoreNumChangeEvent();
 	       	$("#criteriaTypeStr").val($("#criteriaMethod").val());
+
+	       	// In case kpi edit // 
+	       	if($("input#actionStatus").val() == "editKpi"){
+	       		// KPI base value //				
+				levelId = "${kpiForm.kpiModel.levelId}";				
+				calendarTypeId = "${kpiForm.kpiModel.calendarTypeId}";
+				periodId = "${kpiForm.kpiModel.periodId}";				
+				criteriaTypeId = "${kpiForm.kpiModel.criteriaTypeId}";
+				criteriaMethodId = "${kpiForm.kpiModel.criteriaMethodId}";
+				radioCriteriaScore = "${kpiForm.radioCriteriaScore}";
+	       	}
+	       	
 	       	getCriteraiMethod();
 	       	getSuperKpi();
+	       	
 	    });
 
 	    function pageMessage(){
@@ -168,32 +185,35 @@
 	    	}
 	    		return false;
 	    }
+
+	    <%--
 		function getKpiParentList(el){
-				$(el).hide();
-				$(el).next("img").show();
-				var levelId = $("#detailLevel").val();
-				var groupId = $("#detailGroup").val();
-				var strId = $("#detailStructure").val();
-				var target = $('#detailParent').empty();
-				$.ajax({
-	    			dataType:'json',
-	    			url: "<%=doSearchKpiName%>" ,
-	    			data: { 'level':levelId,'group': groupId, 'structure':strId  } ,
-	    			success: function(data){
-	    				if(data["header"]["size"]>0){
-	    					var dat = data["content"]["lists"];
-	    					var opt = $("<option>none</option>");
-	    		    		target.append(opt);
-		    				for(var i=0;i<dat.length;i++){
-		    		    		var opt = $("<option value=\""+dat[i]["id"]+"\"></option>").html(dat[i]["name"]);
-		    		    		target.append(opt);
-		    		    	} 
-		    				$(el).show();
-		    				$(el).next("img").hide();
-		    			}
+			$(el).hide();
+			$(el).next("img").show();
+			var levelId = $("#detailLevel").val();
+			var groupId = $("#detailGroup").val();
+			var strId = $("#detailStructure").val();
+			var target = $('#detailParent').empty();
+			$.ajax({
+	    		dataType:'json',
+	    		url: "<%=doSearchKpiName%>" ,
+	    		data: { 'level':levelId,'group': groupId, 'structure':strId  } ,
+	    		success: function(data){
+	    			console.log(data);
+	    			if(data["header"]["size"]>0){
+	    				var dat = data["content"]["lists"];
+	    				var opt = $("<option>none</option>");
+	    	    		target.append(opt);
+		   				for(var i=0;i<dat.length;i++){
+		   		    		var opt = $("<option value=\""+dat[i]["id"]+"\"></option>").html(dat[i]["name"]);
+		   		    		target.append(opt);
+		   		    	} 
+		   				$(el).show();
+		   				$(el).next("img").hide();
+		   			}
 	    			}
-	    		});
-		}
+	    	});
+		} --%>
 
 
 		function getCriteraiMethod(){
@@ -212,9 +232,9 @@
 		    		} 
 				}
 			});
-			if(baseVal.length > 0){
+			/*if(baseVal.length > 0){
 				traget.val(baseVal);
-			}
+			}*/
 		}
 
 		function verifyDataOnSubmit(){
@@ -235,44 +255,55 @@
 		}
 
     	function doSubmitDetail(){
+    		if(levelId != $("#detailLevel").val()
+				||calendarTypeId != $("#detailCalendarType").val()
+				||periodId != $("#detailPeriod").val()
+				||criteriaTypeId != $("#criteriaTypeId").val()
+				||criteriaMethodId != $("#criteriaMethod").val()
+				||radioCriteriaScore != $('input[name=radioCriteriaScore]:checked').val()
+    			){
 
-	    	if($("input#actionStatus").val() == "editKpi"){
-	    		var baseCriteriaType = $("#criteriaTypeStr");
-	    		var baseDetailCalendarType = $("#detailCalendarTypeStr");
-	    		var baseDetailPeriod = $("#detailPeriodStr");
+    			// Information changed //
+    			if($("input#actionStatus").val() == "editKpi"){
+    				var baseCriteriaType = $("#criteriaTypeStr");
+		    		var baseDetailCalendarType = $("#detailCalendarTypeStr");
+		    		var baseDetailPeriod = $("#detailPeriodStr");
 
-	    		var newCriteriaType = $("select#criteriaMethod option:selected");
-	    		var newDetailCalendarType = $("select#detailCalendarType option:selected");
-	    		var newDetailPeriod = $("select#detailPeriod option:selected");
+		    		var newCriteriaType = $("select#criteriaMethod option:selected");
+		    		var newDetailCalendarType = $("select#detailCalendarType option:selected");
+		    		var newDetailPeriod = $("select#detailPeriod option:selected");
 
-	    		if(baseCriteriaType.val() != newCriteriaType.val() 
-	    			|| baseDetailCalendarType.val() != newDetailCalendarType.val() 
-	    			|| baseDetailPeriod.val() != newDetailPeriod.val()){
-	    			$.confirm({
-					    text: 'ท่านได้ทำการเปลี่ยนแปลงข้อมูลที่มีผล ทำให้เกณฑ์การประเมิน, เป้าหมาย หรือผลการดำเนินงาน อาจไม่ถูกต้อง <br/><br/> <font style="color:red"> <u style="color:red">หมายเหตุ</u> ถ้าท่านยืนบันทึกข้อมูล ระบบจะทำการลบข้อมูล เกณฑ์การประเมิน, เป้าหมาย และผลการดำเนินงาน เพื่อให้ข้อมูลถูกต้องท่านต้องบันทึกข้อมูลที่ถูกลบดังกล่าวใหม่</font>',
-					    title: "ยืนยันการบันทึก ตัวบ่งชี้",
-					    confirm: function(button) {
-							if(doDeleteKpiChildTable() == "1"){
-								doSubmit(); 
-							}
+		    		if(baseCriteriaType.val() != newCriteriaType.val() 
+		    			|| baseDetailCalendarType.val() != newDetailCalendarType.val() 
+		    			|| baseDetailPeriod.val() != newDetailPeriod.val()){
+		    			$.confirm({
+						    text: 'ท่านได้ทำการเปลี่ยนแปลงข้อมูลที่มีผล ทำให้เกณฑ์การประเมิน, เป้าหมาย หรือผลการดำเนินงาน อาจไม่ถูกต้อง <br/><br/> <font style="color:red"> <u style="color:red">หมายเหตุ</u> ถ้าท่านยืนบันทึกข้อมูล ระบบจะทำการลบข้อมูล เกณฑ์การประเมิน, เป้าหมาย และผลการดำเนินงาน เพื่อให้ข้อมูลถูกต้องท่านต้องบันทึกข้อมูลที่ถูกลบดังกล่าวใหม่</font>',
+						    title: "ยืนยันการบันทึก ตัวบ่งชี้",
+						    confirm: function(button) {
+								if(doDeleteKpiChildTable() == "1"){
+									doSubmit(); 
+								}
 
-					    },
-					    cancel: function(button) {
-					        // nothing to do
-					    },
-					    confirmButton: "ยืนยัน",
-					    cancelButton: "ยกเลิก",
-					    post: true,
-					    confirmButtonClass: "btn-primary",
-					    cancelButtonClass: "btn-danger",
-					    dialogClass: "modal-dialog modal-lg" // Bootstrap classes for large modal
-					});
-	    		}else{
-	    			doSubmit();
-	    		}
-	    	}else{
-	    		doSubmit();
-	    	}
+						    },
+						    cancel: function(button) {
+						        // nothing to do
+						    },
+						    confirmButton: "ยืนยัน",
+						    cancelButton: "ยกเลิก",
+						    post: true,
+						    confirmButtonClass: "btn-primary",
+						    cancelButtonClass: "btn-danger",
+						    dialogClass: "modal-dialog modal-lg" // Bootstrap classes for large modal
+						});
+		    		}else{
+		    			doSubmit();
+		    		}
+    			}else{
+    				doSubmit();
+    			}
+    		}else{
+    			doSubmit();
+    		}
     	}
 
     	function doSubmit(){
@@ -1335,6 +1366,10 @@
 				}
 			});
 		}
+		function actAdd(){
+			$('#kpiFormDetail').attr("action","<%=actionNew%>");
+			$('#kpiFormDetail').submit();			
+		}
     </script>
     <style type="text/css">
     	table.tableKpiDetail,table.tableKpiCriteria{ width:100%;}
@@ -1394,7 +1429,7 @@
     	#cds-pagging ul{ list-style:none;}
     	#cds-list{ clear:both; }
     	.actionMessage{ background-color:#CCCCFF; border:1px solid red;padding:15px 15px 15px 15px; display:inline; }
-    	body *{color:black;}
+    	/*body *{color:black;}*/
     	#kpi-Detail select{ min-width:150px;max-width:300px;}
     	.aui select{
 			color:black;
@@ -1472,23 +1507,33 @@
 				</tr>
 				<tr>
 					<td>
-						<label>หน่วยวัด </label><form:select id="detailUom" path="kpiModel.uomId" items="${uomList}" class="Required"/>
+						<label>หน่วยวัด </label>
+						<form:select id="detailUom" path="kpiModel.uomId" items="${uomList}" class="Required" />
 					</td>	
 					<td>
 						<label>ภายใต้ตัวบ่งชี้</label>
-						<!-- <form:select id="detailParent"  path="kpiModel.parentId" items="${parentList}"/> -->
-						<form:select id="detailParent"  path="kpiModel.parentId" class="Nossss">
-							<!-- <form:options items="${parentList}" title="${parentList}"/> -->
-							<c:forEach items="${parentList}" var="parent">
-								<option 
-									value="${parent.key}" 
-									title="${fn:substring(parent.value, fn:indexOf(parent.value, ":")+1, fn:length(parent.value))}"> 
-									${fn:substring(parent.value, 0, fn:indexOf(parent.value, ":"))}
-								</option>
+						<form:select id="detailParent"  path="kpiModel.parentId" class="input-large">
+							<c:forEach items="${parentList}" var="parent" varStatus="status">
+								<c:choose>
+									<c:when test="${kpiForm.kpiModel.parentId eq parent.key}">
+										<option selected="true"
+											value="${parent.key}" 
+											title="${fn:substring(parent.value, fn:indexOf(parent.value, ":")+1, fn:length(parent.value))}"> 
+											${fn:substring(parent.value, 0, fn:indexOf(parent.value, ":"))}
+										</option>
+									</c:when>
+									<c:otherwise>
+										<option
+											value="${parent.key}" 
+											title="${fn:substring(parent.value, fn:indexOf(parent.value, ":")+1, fn:length(parent.value))}"> 
+											${fn:substring(parent.value, 0, fn:indexOf(parent.value, ":"))}
+										</option>
+									</c:otherwise>
+								</c:choose> 
 							</c:forEach>
 						</form:select>
-						<img height="24" width="24" style="cursor: pointer" src="<c:url value="/resources/images/refresh-rect-bw.png"/>" onclick="getKpiParentList()" />
-						<img height="24" width="24" style="display:none;" src="<c:url value="/resources/images/loading_blue_32.gif"/>" />
+						<!-- <img height="24" width="24" style="cursor: pointer" src="<c:url value="/resources/images/refresh-rect-bw.png"/>" onclick="getKpiParentList()" />
+						<img height="24" width="24" style="display:none;" src="<c:url value="/resources/images/loading_blue_32.gif"/>" /> -->
 					</td>
 				</tr>
 				<tr>
@@ -1510,7 +1555,8 @@
 				<tr>
 					<td>
 						<label>เกณฑ์คะแนน</label>
-						<form:radiobutton id="radioCriteriaScore1" name="radioCriteriaScore" path="radioCriteriaScore" value="integer" />  เทียบคะแนนเต็มเท่ากับร้อยละ <form:input id="criteriaScore" path="kpiModel.criteriaScore" type="text" style="width:30px" class="numbersOnly"/> &nbsp
+						<form:radiobutton id="radioCriteriaScore1" name="radioCriteriaScore" path="radioCriteriaScore" value="integer" />  เทียบคะแนนเต็มเท่ากับร้อยละ 
+						<form:input id="criteriaScore" path="kpiModel.criteriaScore" type="text" style="width:30px" class="numbersOnly"/> &nbsp
 						<form:radiobutton id="radioCriteriaScore2" name="radioCriteriaScore" path="radioCriteriaScore" value="pass"/> ผ่าน/ไม่ผ่าน
 					</td>
 				</tr>
@@ -1530,6 +1576,7 @@
 			<div style="text-align:center;">
 				<input onClick="verifyDataOnSubmit()" type="button" class="save" value="บันทึก" style="{margin-right:10px;}" />
 				<input type="button" class="cancel" onClick="doBack2List()" value="ยกเลิก" /> 
+				<input type="button" class="btn btn-success" onClick="actAdd()" value="เพิ่มตัวบ่งชี้ใหม่" /> 
 			</div>
 			</form:form>			
 		</div> <!--  end detail box -->

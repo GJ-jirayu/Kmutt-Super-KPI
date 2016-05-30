@@ -33,7 +33,7 @@
 	<link rel="stylesheet" href="<c:url value="/resources/css/common-element.css"/>" type="text/css"/>
 	
     <script type="text/javascript"> 
-   	  	var dialog,dialog2,gobalGroupTypeName,gobalGroupTypeStName;
+   	  	var dialog,dialog2,gobalGroupStName, gobalGroupName, gobalGroupType;
     	$( document ).ready(function() {
     		paging();
     		$('.numPage').val(${PageCur});
@@ -129,8 +129,10 @@
    	 	function actSaveEdit(){
    	 		var currentName = $("input#fGroupName").val(); 
    	 		var currentStName = $("input#fGroupStName").val();
-   	 		if($.trim(gobalGroupTypeName) == $.trim(currentName) 
-   	 			&& $.trim(currentStName) == $.trim(gobalGroupTypeStName)){
+   	 		var currentGroup = $("select#fGroupType").val();
+   	 		if($.trim(gobalGroupName) == $.trim(currentName) 
+   	 			&& $.trim(gobalGroupStName) == $.trim(currentStName)
+   	 			&& $.trim(gobalGroupType) == $.trim(currentGroup)){
    	 			actCancel();
    	 		}else{
    	 			console.log("Saveee");
@@ -158,8 +160,9 @@
 	 			$(d1).find('select#fOrgType').val(valDesc["orgId"]);
 	   			$(d1).find('select#fGroupType').val(valDesc["groupType"]);
 	 		}
-	   		gobalGroupTypeName = valDesc["name"]; 
-	   		gobalGroupTypeStName = valDesc["shortName"];
+	   		gobalGroupName = valDesc["name"]; 
+	   		gobalGroupStName = valDesc["shortName"];
+	   		gobalGroupType = valDesc["groupType"];
 
    	 		$(d1).find('span').html(head);
    	 		$(d1).find('input[type=hidden]#fGroupId').val(rowNum);
@@ -226,9 +229,9 @@
    		
    		table.tableGridLv th:nth-child(1){ width:5%; }
    		table.tableGridLv th:nth-child(2){ width:15%; }
-   		table.tableGridLv th:nth-child(3){ width:30%; }
-   		table.tableGridLv th:nth-child(4){ width:15%; }
-   		table.tableGridLv th:nth-child(5){ width:15%; }
+   		table.tableGridLv th:nth-child(3){ width:40%; }
+   		table.tableGridLv th:nth-child(4){ display: none; }
+   		table.tableGridLv th:nth-child(5){ width:20%; }
    		table.tableGridLv th:nth-child(6){ width:10%; }
    		table.tableGridLv th:nth-child(7){ width:10%; }
    		table.tableGridLv th:nth-child(8), table.tableGridLv td:nth-child(8){ width:0%; display:none;}
@@ -285,13 +288,14 @@
 								<td style="text-align:right">ชื่อเป้าประสงค์ : </td>
 								<td><form:input id="fGroupName" path="kpiGroupModel.groupName" maxlength="255"/></td>
 							</tr>
-							<tr>
+							<tr style="display: none;">
 								<td style="text-align:right">ประเภทหน่วยงาน : </td>
 								<td>
 									<form:select id="fOrgType" path="kpiGroupModel.orgTypeId">
-										<c:forEach items="${orgTypes}" var="org" varStatus="loop">
+										<!-- <c:forEach items="${orgTypes}" var="org" varStatus="loop">
 										<option value="${org.orgTypeId}">${org.orgTypeName}</option>
-										</c:forEach>
+										</c:forEach> -->
+										<option selected value>None</option>
 									</form:select>
 								</td>
 							</tr>
@@ -379,7 +383,7 @@
 								<td class="padL">${(loop.count+((PageCur-1)*pageSize))}</td>
 								<td>${chandraFn:nl2br(group.groupShortName)}</td>
 								<td>${chandraFn:nl2br(group.groupName)} </td>
-								<td>${chandraFn:nl2br(group.orgTypeName)}</td>
+								<td style="display: none;">${chandraFn:nl2br(group.orgTypeName)}</td>
 								<td>${chandraFn:nl2br(group.groupTypeName)}</td>
 								<td align="center">
 									<img src="<c:url value="/resources/images/edited.png"/>" width="22" height="22" onClick="actEdit(this)" style="cursor: pointer;">
