@@ -108,10 +108,9 @@
 				criteriaMethodId = "${kpiForm.kpiModel.criteriaMethodId}";
 				radioCriteriaScore = "${kpiForm.radioCriteriaScore}";
 	       	}
-	       	
+
 	       	getCriteraiMethod();
-	       	getSuperKpi();
-	       	
+	     	getSuperKpi(); 
 	    });
 
 	    function pageMessage(){
@@ -227,8 +226,16 @@
 				success: function(data){
 					console.log(data);
 					for(var i=0;i<data["lists"].length;i++){
-		    		    var opt = '<option value="'+data["lists"][i]["id"]+'"> '+data["lists"][i]["name"]+' </option>';
-		    			traget.append(opt);
+						if($.trim(criteriaMethodId) == $.trim(data["lists"][i]["id"])){
+							traget.append(
+								'<option selected value="'+data["lists"][i]["id"]+'"> '+data["lists"][i]["name"]+' </option>'
+								);
+						}else{
+							traget.append(
+								'<option value="'+data["lists"][i]["id"]+'"> '+data["lists"][i]["name"]+' </option>'
+								);
+						}
+		    			
 		    		} 
 				}
 			});
@@ -254,7 +261,7 @@
 			if(elCount == 0){ doSubmitDetail(); }else{ alert("กรุณากรอกข้อมูลให้ครบถ้วน!!");}
 		}
 
-    	function doSubmitDetail(){
+    	function doSubmitDetail(){ console.log("-->"+criteriaMethodId+": "+$("#criteriaMethod").val());
     		if(levelId != $("#detailLevel").val()
 				||calendarTypeId != $("#detailCalendarType").val()
 				||periodId != $("#detailPeriod").val()
@@ -1532,8 +1539,6 @@
 								</c:choose> 
 							</c:forEach>
 						</form:select>
-						<!-- <img height="24" width="24" style="cursor: pointer" src="<c:url value="/resources/images/refresh-rect-bw.png"/>" onclick="getKpiParentList()" />
-						<img height="24" width="24" style="display:none;" src="<c:url value="/resources/images/loading_blue_32.gif"/>" /> -->
 					</td>
 				</tr>
 				<tr>
@@ -1562,7 +1567,8 @@
 				</tr>
 				<tr>
 					<td>
-						<label>วิธีการประเมิน</label><form:select id="criteriaMethod" class="input-large" onchange="toggleBaselineLayout()"   path="kpiModel.criteriaMethodId" items="${criteriaMethodList}" />
+						<label>วิธีการประเมิน</label>
+						<form:select id="criteriaMethod" class="input-large" onchange="toggleBaselineLayout()" path="kpiModel.criteriaMethodId" items="${criteriaMethodList}" />
 					</td>
 				</tr>
 				<tr style="display:none;"> 

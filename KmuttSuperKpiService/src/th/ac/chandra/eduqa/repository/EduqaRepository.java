@@ -2244,7 +2244,7 @@ public class EduqaRepository   {
 		}
 		
 		
-		/* KPI RESULT INSERTS */
+		// KPI RESULT INSERTS //
 		public Integer insertsKpiResult(KpiResultModel model){
 			/*
 			 * ตรวจสอบว่ามี kpi_result แล้วหรือยัง(โดยมี academicYrat, orgId, kpiId เป็นเงื่อนไข)
@@ -2342,7 +2342,7 @@ public class EduqaRepository   {
 					domain.setParentKpiId((Integer) ob[24]);
 					domain.setHasChild((String) ob[25]);
 					
-					/*ตรวจสอบว่ามี kpi_result แล้วหรือยัง(โดยมี academicYrat, orgId, kpiId เป็นเงื่อนไข)*/
+					/*ตรวจสอบว่ามี kpi_result แล้วหรือยัง(โดยมี academicYear, orgId, kpiId เป็นเงื่อนไข)*/
 					String verifyKpiResult = "SELECT * FROM kpi_result "
 							+" where kpi_id = "+kid
 							+" and org_id = "+domain.getOrgId();
@@ -2358,9 +2358,9 @@ public class EduqaRepository   {
 					Integer rowSize = verifyKpiResultQuery.getResultList().size();
 					System.out.println("\n Kpi Id: "+kid+", Row size: "+rowSize+"\n");
 					
-					/*กรณียังไม่มี result ทำการ insert ทั้ง 12 เดือน*/
+					// กรณียังไม่มี result ทำการ insert ทั้ง 12 เดือน //
 					if(rowSize == 0){ System.out.println("\n Insert Only! \n");
-						/* Distrubute month 1-12 */
+						// Distribute month 1-12 //
 						for(Integer i = 1;i<=12;i++){
 							KpiResult mm = new KpiResult();
 							BeanUtils.copyProperties(domain, mm);
@@ -2379,6 +2379,7 @@ public class EduqaRepository   {
 							query = entityManager.createQuery(sqlMonth,SysMonth.class);
 							SysMonth month = (SysMonth) query.getResultList().get(0);
 							mm.setMonthID(month.getMonthId());
+							mm.setThMonthName(month.getThMonthName());
 							mm.setCalendarYear(month.getCalendarYear());
 							mm.setAcademicYear(month.getAcademicYear());
 							mm.setFiscalYear(month.getFiscalYear());
@@ -2423,6 +2424,7 @@ public class EduqaRepository   {
 							query = entityManager.createQuery(sqlMonth,SysMonth.class);
 							SysMonth month = (SysMonth) query.getResultList().get(0);
 							mm.setMonthID(month.getMonthId());
+							mm.setThMonthName(month.getThMonthName());
 							mm.setCalendarYear(month.getCalendarYear());
 							mm.setAcademicYear(month.getAcademicYear());
 							mm.setFiscalYear(month.getFiscalYear());

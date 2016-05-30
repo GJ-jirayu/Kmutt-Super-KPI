@@ -162,6 +162,9 @@ public class KpiResult implements Serializable {
     @Column(name="FISCAL_YEAR")
     private Integer fiscalYear;
     
+    @Column(name="TH_MONTH_NAME")
+    private String thMonthName;
+    
 	/*//bi-directional many-to-one association to ResearcherGroup
 	@OneToMany(mappedBy="researchGroup")
 	private List<ResearcherGroup> researcherGroups;*/
@@ -551,5 +554,13 @@ public class KpiResult implements Serializable {
 
 	public void setFiscalYear(Integer fiscalYear) {
 		this.fiscalYear = fiscalYear;
+	}
+
+	public String getThMonthName() {
+		return thMonthName;
+	}
+
+	public void setThMonthName(String thMonthName) {
+		this.thMonthName = thMonthName;
 	}
 }

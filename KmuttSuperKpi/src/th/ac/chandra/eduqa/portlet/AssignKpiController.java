@@ -641,7 +641,7 @@ public class AssignKpiController {
 			Integer deleteStatusCode = null, insertStatusCode = null; 
 			String deleteStatusDesc = "", insertStatusDesc = "";
 			
-			/*delete result of org before insert*/ 
+			// delete result of org before insert // 
 			if(deleteKpis != null && deleteKpis != ""){
 				String[] kpisPart = deleteKpis.split("-");
 				List<Integer> kpisList = new ArrayList<Integer>();
@@ -667,7 +667,7 @@ public class AssignKpiController {
 				deleteStatusCode = 1;
 			}
 			
-			//Save kpi_result
+			//  Save kpi_result //
 			if(insertKpis != null && insertKpis != ""){
 				String[] kpisPart = insertKpis.split("-");
 				List<Integer> kpisList = new ArrayList<Integer>();

@@ -62,6 +62,7 @@ public class KpiResultModel extends ImakeXML implements Serializable{
     private Integer fiscalMonthNo;
     private Integer calendarYear;
     private Integer fiscalYear;
+    private String thMonthName;
 	
 	public KpiResultModel() {
 	}
@@ -472,6 +473,14 @@ public class KpiResultModel extends ImakeXML implements Serializable{
 
 	public void setKpiWeights(List<String> kpiWeights) {
 		this.kpiWeights = kpiWeights;
+	}
+
+	public String getThMonthName() {
+		return thMonthName;
+	}
+
+	public void setThMonthName(String thMonthName) {
+		this.thMonthName = thMonthName;
 	}
 	
 }
