@@ -29,17 +29,13 @@
 <!-- Bootstrap core CSS -->
 <link rel="stylesheet" href="<c:url value="/resources/bootstrap/css/bootstrap.min.css"/>" type="text/css" />
 <script src="<c:url value="/resources/js/jquery-1.11.2.min.js"/>"></script>
-<script
-	src="<c:url value="/resources/js/smoothness/jquery-ui-1.9.1.custom.min.js"/>"></script>
-<link rel="stylesheet"
-	href="<c:url value="/resources/css/smoothness/jquery-ui-1.9.1.custom.min.css"/>" />
+<script src="<c:url value="/resources/js/confirm-master/jquery.confirm.min.js"/>"></script> 
+<script	src="<c:url value="/resources/js/smoothness/jquery-ui-1.9.1.custom.min.js"/>"></script>
+<link rel="stylesheet" href="<c:url value="/resources/css/smoothness/jquery-ui-1.9.1.custom.min.css"/>" />
 <script src="<c:url value="/resources/bootstrap/js/bootstrap.min.js"/>"></script>
-<script
-	src="<c:url value="/resources/bootstrap/js/bootstrap-typeahead.min.js"/>"></script>
-<link rel="stylesheet" type="text/css"
-	href="<c:url value="/resources/css/override-portlet-aui.css"/>" />
-<link rel="stylesheet" type="text/css"
-	href="<c:url value="/resources/css/override-jqueryui.css"/>" />
+<script	src="<c:url value="/resources/bootstrap/js/bootstrap-typeahead.min.js"/>"></script>
+<link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/override-portlet-aui.css"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/override-jqueryui.css"/>" />
 <link rel="stylesheet"href="<c:url value="/resources/css/common-element.css"/>"type="text/css" />
 <link rel="stylesheet" href="<c:url value="/resources/css/style.css"/>" type="text/css" />
 <script type="text/javascript"> 
@@ -312,7 +308,23 @@
    	 		if(sumValue == null || sumValue == 100){
    	 			insertResult(currentWeightValArr);
    	 		}else{
-   	 			alert("ค่าถ่วงน้ำหนัก จะต้องรวมกันได้ 100 (รอคิดอีกที)");
+	   	 		$.confirm({
+			   	     text: "ค่าถ่วงน้ำหนักรวมกันต้องเท่ากับ 100",
+			   	     title: "บันทึก กำหนดตัวบ่งชี้",
+			   	     confirm: function(button) {		 
+			   	     	// nothing to do
+			   	     },
+			   	     cancel: function(button) {
+			   	         // nothing to do
+			   	     },
+			   	     confirmButton: "ตกลง",
+			   	     cancelButton: "ยกเลืก",
+			   	     post: true,
+			   	     confirmButtonClass: "btn-primary",
+			   	     cancelButtonClass: "btn-danger",
+			   	     dialogClass: "modal-dialog modal-lg" // Bootstrap classes for large modal
+				});
+	   	 		$(".btn-danger").hide();
    	 		}
    	 	}
 
@@ -497,7 +509,7 @@
 					<form:options items="${levelList}" />
 				</form:select>
 
-				<span>กลุ่มตัวบ่งชี้: </span>
+				<span>เป้าประสงค์: </span>
 				<form:select id="groupId" path="groupId" class="input-xlarge wid">
 					<form:options items="${groupLists}" />
 				</form:select>
@@ -551,7 +563,7 @@
 							<th>ประเภทปฏิทิน</td>
 							<th class="center">ช่วงเวลา</th>
 							<th class="center">หน่วยวัด</th>
-							<th class="center">ค่าถ่วงน้ำนัก</th>
+							<th class="center">ค่าถ่วงน้ำหนัก</th>
 							<th class="center">เป้าหมาย</th>
 						</tr>
 					</thead>

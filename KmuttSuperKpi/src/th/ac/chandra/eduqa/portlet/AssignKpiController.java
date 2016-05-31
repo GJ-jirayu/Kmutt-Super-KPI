@@ -86,6 +86,7 @@ public class AssignKpiController {
 		
 		Map<Integer,String> groupLists = new HashMap<Integer,String>();
 		List<KpiGroupModel> groups = service.searchKpiGroup(new KpiGroupModel());
+		groupLists.put(0, "ทุกเป้าประสงค์");
 		for(KpiGroupModel group : groups){
 			groupLists.put(group.getGroupId(), group.getGroupName());
 		}
@@ -93,6 +94,7 @@ public class AssignKpiController {
 		
 		Map<Integer,String> perLists = new HashMap<Integer,String>();
 		List<KpiPerspectiveModel> pers = service.searchKpiPerspective(new KpiPerspectiveModel());
+		perLists.put(0, "ทุกมุมมอง");
 		for(KpiPerspectiveModel per : pers){
 			perLists.put(per.getPerspcId(), per.getPerspcName());
 		}
@@ -120,15 +122,17 @@ public class AssignKpiController {
 		}
 		KpiResultModel resultModel = new KpiResultModel();
 		resultModel.setOrgId(org.getOrgId());
-		resultModel.setKpiLevelId(org.getLevelId()  );
-		resultModel.setKpiGroupId(groups.get(0).getGroupId()); //Get first Value from groups for setter whit KpiGroupId
-		resultModel.setKpiPerspectiveId(pers.get(0).getPerspcId()); //Get first Value from groups for setter whit KpiPerspectiveId
+		resultModel.setKpiLevelId(org.getLevelId());
+		//resultModel.setKpiGroupId(groups.get(0).getGroupId()); //Get first Value from groups for setter whit KpiGroupId
+		//resultModel.setKpiPerspectiveId(pers.get(0).getPerspcId()); //Get first Value from groups for setter whit KpiPerspectiveId
+		resultModel.setKpiGroupId(0); //Get Default value
+		resultModel.setKpiPerspectiveId(0); //Get Default value
 		List<KpiResultModel> resultKpis = service.searchKpiResultWithActiveKpi(resultModel);
 		List<KpiListForm> lists = convertAccordion(resultKpis);
 		model.addAttribute("accordions",lists);
 		model.addAttribute("lastPage",service.getResultPage());
 		
-		// list
+		// list value for select tag //
 		Map<Integer,String> levelList = new HashMap<Integer,String>();
 		List<KpiLevelModel> levels = service.searchKpiLevel(new KpiLevelModel());
 		for(KpiLevelModel level : levels){
@@ -252,6 +256,7 @@ public class AssignKpiController {
 		
 		Map<Integer,String> groupLists = new HashMap<Integer,String>();
 		List<KpiGroupModel> groups = service.searchKpiGroup(new KpiGroupModel());
+		groupLists.put(0, "ทุกเป้าประสงค์");
 		for(KpiGroupModel group : groups){
 			groupLists.put(group.getGroupId(), group.getGroupName());
 		}
@@ -259,6 +264,7 @@ public class AssignKpiController {
 		
 		Map<Integer,String> perLists = new HashMap<Integer,String>();
 		List<KpiPerspectiveModel> pers = service.searchKpiPerspective(new KpiPerspectiveModel());
+		perLists.put(0, "ทุกมุมมอง");
 		for(KpiPerspectiveModel per : pers){
 			perLists.put(per.getPerspcId(), per.getPerspcName());
 		}
@@ -282,9 +288,10 @@ public class AssignKpiController {
 	public void actionSubmitFilter(javax.portlet.ActionRequest request, javax.portlet.ActionResponse response
 			,@ModelAttribute("HierarchyAuthorityForm") HierarchyAuthorityForm HieAuth,BindingResult result,Model model){
 		response.setRenderParameter("render", "showList");
-		response.setRenderParameter("workOrgId",HieAuth.findoutOrg());
+		response.setRenderParameter("workOrgId",HieAuth.getOrgId().toString());
 		response.setRenderParameter("groupId",HieAuth.getGroupId().toString());
 		response.setRenderParameter("perspectiveId",HieAuth.getPerspectiveId().toString());
+		//System.out.println("\n Assign Kpi -> doSubmitFilter -> OrgId:"+HieAuth.getOrgId().toString()+" \n");
 	}
 	@RequestMapping(params="action=doBack2List") 
 	public void actionBack2List(javax.portlet.ActionRequest request, javax.portlet.ActionResponse response

@@ -32,8 +32,7 @@ public class Org implements Serializable {
 	@Column(name="KPI_LEVEL_ID")
 	private Integer levelId;
 	
-	//@Column(name="PARENT_ORG_ID")
-	@Column(name="PARENT")
+	@Column(name="PARENT_ORG_ID")
 	private Integer parentOrgId;
 	
 	@Column(name="PATH")

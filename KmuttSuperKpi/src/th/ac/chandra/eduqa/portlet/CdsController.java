@@ -169,23 +169,26 @@ public class CdsController {
 		return "master/cds";
 	}
 	
-	
 	@RequestMapping(params="action=doNew") 
 	public void newDetail(javax.portlet.ActionRequest request, javax.portlet.ActionResponse response,
 			@ModelAttribute("cdsForm") CdsForm cdsForm,BindingResult result,Model model){
 		//CdsModel cds = service.findCdsById(1);
+		cdsForm.getCdsModel().setCdsId(null);
 		response.setRenderParameter("render", "displayDetail");
+		response.setRenderParameter("pageAction", "new");
 	}
-	@RequestMapping(params="action=doEdit") 
+	@RequestMapping(params="action=doEdit")
 	public void editDetail(javax.portlet.ActionRequest request, javax.portlet.ActionResponse response,
 			@ModelAttribute("cdsForm") CdsForm cdsForm,BindingResult result,Model model){
 		response.setRenderParameter("render", "displayDetail");
 		response.setRenderParameter("cdsId",String.valueOf( cdsForm.getCdsModel().getCdsId() ) ) ;
+		response.setRenderParameter("pageAction", "edit");
 	}
+	
 	@RequestMapping("VIEW")
 	@RenderMapping(params="render=displayDetail")
 	public String displayDetail(PortletRequest request,Model model){
-		// level
+		// level //
 		Map<Integer,String> levelList = new HashMap<Integer,String>();
 		levelList.put(1,"สถาบัน");
 		levelList.put(2,"คณะ");
@@ -265,6 +268,7 @@ public class CdsController {
 		model.addAttribute("qDetailList",qDetailList);
 		model.addAttribute("qYearList",qYearList);
 		model.addAttribute("qMonthList",qMonthList);
+		model.addAttribute("pageAction", request.getParameter("pageAction"));
 		
 		return "master/cdsDetail";
 	}
@@ -343,14 +347,13 @@ public class CdsController {
 		cds.setAcademicYear(getCurrentYear());		
 		
 		ResultService rs = new ResultService();
-		if(cds.getCdsId()==null  ){
+		if(cds.getCdsId() != null){
+			cds.setUpdatedBy(user.getFullName());
+			rs = service.updateCds(cds);			
+		}else{
 			cds.setCreatedBy(user.getFullName());
 			cds.setUpdatedBy(user.getFullName());
 			rs = service.saveCds(cds);
-		}
-		else{
-			cds.setUpdatedBy(user.getFullName());
-			rs = service.updateCds(cds);
 		}
 		response.setRenderParameter("render", "backToList");
 		response.setRenderParameter("messageCode", rs.getMsgCode());

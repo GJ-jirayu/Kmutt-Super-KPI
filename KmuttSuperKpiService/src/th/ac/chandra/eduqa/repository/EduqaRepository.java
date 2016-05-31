@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
+import javassist.expr.NewArray;
 import th.ac.chandra.eduqa.domain.BaselineQuan;
 import th.ac.chandra.eduqa.domain.BaselineRange;
 import th.ac.chandra.eduqa.domain.BaselineSpec;
@@ -902,13 +903,19 @@ public class EduqaRepository   {
 		   else if(matcher.group(1).equals("max")){ 	allFunc.add("0"); }
 		   else{  	allFunc.add("0");		}
 		 }
-		 for(int i=0;i<allMatch.size();i++){
-			 //query
-			KpiXCds kc = new KpiXCds();
-			BeanUtils.copyProperties(kpi, kc);
-			kc.setCdsId( Integer.parseInt(allCds.get(i) ));
-			kc.setAccum( Integer.parseInt(allFunc.get(i) )); 
-			entityManager.persist(kc);
+		 // ทำากรลบข้อมูลที่ตาราง kpi_cds_mapping ตาม kpi_id เพื่อไม่ให้ข้อมูลซ้ำ // 
+		 Integer kpiCdeMapDel = entityManager.createNativeQuery(
+				 "delete from kpi_cds_mapping where KPI_ID="+ kpi.getKpiId()
+				 ).executeUpdate();
+		 if(kpiCdeMapDel != -1){
+			 for(int i=0;i<allMatch.size();i++){
+				 //query
+				KpiXCds kc = new KpiXCds();
+				BeanUtils.copyProperties(kpi, kc);
+				kc.setCdsId( Integer.parseInt(allCds.get(i) ));
+				kc.setAccum( Integer.parseInt(allFunc.get(i) )); 
+				entityManager.persist(kc);
+			 }
 		 }
 		return updatedCount;
 	}
@@ -1976,7 +1983,8 @@ public class EduqaRepository   {
 					+ "has_child, "
 					+ "formula_desc, "
 					+ "multiplicand, "
-					+ "denominator " 
+					+ "denominator, "
+					+ "th_month_name" 
 					+ "from kpi_result where org_id = "+result.getOrgId()+" and kpi_id = "+result.getKpiId()+" and month_id = "+result.getMonthID();
 			Query queryCheck = entityManager.createNativeQuery(qCheck);
 			List<Object[]> resultCheck = queryCheck.getResultList();			
@@ -1996,7 +2004,8 @@ public class EduqaRepository   {
 				result.setHasChild(resultRow[11]==null ? "0" : resultRow[11].toString());	
 				result.setFormulaDesc((String) resultRow[12]);	
 				result.setMultiplicand((String) resultRow[13]);	
-				result.setDenominator((String) resultRow[14]);	
+				result.setDenominator((String) resultRow[14]);
+				result.setThMonthName((String) resultRow[15]);
 				result.setActive(1);
 				entityManager.merge(result);
 				size++;
@@ -2137,8 +2146,11 @@ public class EduqaRepository   {
 					+ " ,(select count(*)from eduqa.kpi_result_detail where result_id = kr.result_id and action_flag = 1) as totalAction  "
 					+ " ,kr.criteria_type_id "
 					+ " from  kpi_result kr  "
-					+ " where org_id = "+domain.getOrgId()+" and academic_year = "+domain.getAcademicYear()
-					+ " and kpi_group_id = "+domain.getKpiGroupId()+" and month_id = "+domain.getMonthID() 
+					+ " where org_id = "+domain.getOrgId()
+					+ " and kpi_group_id = "+domain.getKpiGroupId()
+					+ " and ((academic_year = "+domain.getAcademicYear()+" and th_month_name = '"+domain.getThMonthName()+"')"
+					+ "or (fiscal_year = "+domain.getFiscalYear()+" and th_month_name = '"+domain.getThMonthName()+"')"
+					+ "or (calendar_year = "+domain.getCalendarYear()+" and th_month_name = '"+domain.getThMonthName()+"'))"
 					+ " order by kr.kpi_structure_id,kr.kpi_name";
 			Query query = entityManager.createNativeQuery(sql);
 			//query.setFirstResult((pagging.getPageNo() - 1) * pagging.getPageSize());
@@ -2180,11 +2192,24 @@ public class EduqaRepository   {
 		}
 		
 		
-		public List searchKpiResultWithActiveKpi(KpiResultModel model){
+		public List searchKpiResultWithActiveKpi(KpiResultModel model){			
 			List<KpiResultModel> kms = new ArrayList<KpiResultModel>();
+			String critPerspectiveStr, critGroupStr;			
+			if(model.getKpiPerspectiveId() == 0){
+				critPerspectiveStr = "";
+			}else{
+				critPerspectiveStr = "and kpi_perspective_id="+model.getKpiPerspectiveId();
+			}
+			if(model.getKpiGroupId() == 0){
+				critGroupStr = "";
+			}else{
+				critGroupStr = "and kpi_group_id = "+model.getKpiGroupId();
+			}
+			
 			String sql= "select kpi.kpi_structure_id,"
 					+ "		ks.kpi_structure_name,"
-					+ " 	kpi.kpi_id,kpi.kpi_name,"
+					+ " 	kpi.kpi_id,"
+					+ "		concat(kpi.kpi_code, '-', kpi.kpi_name),"
 					+ " 	grp.kpi_group_short_name,"
 					+ " 	ct.calendar_type_name,"
 					+ " 	p.period_name,"
@@ -2204,8 +2229,10 @@ public class EduqaRepository   {
 					+ "		select * from kpi "
 					+ "		where academic_year="+model.getAcademicYear()
 					+ "		and kpi_level_id="+model.getKpiLevelId()
-					+ "		and kpi_perspective_id="+model.getKpiPerspectiveId()
-					+ "		and kpi_group_id = "+model.getKpiGroupId()
+					+ " "+critPerspectiveStr
+					+ " "+critGroupStr
+					//+ "		and kpi_perspective_id="+model.getKpiPerspectiveId()
+					//+ "		and kpi_group_id = "+model.getKpiGroupId()
 					+ "	) kpi"
 					+ " left join kpi_structure ks on ks.kpi_structure_id = kpi.kpi_structure_id"
 					+ " 	and ks.academic_year = kpi.academic_year"  
@@ -2216,7 +2243,7 @@ public class EduqaRepository   {
 					+ " left join kpi_uom uom on kpi.kpi_uom_id = uom.kpi_uom_id"  
 					+ " 	and kpi.academic_year = uom.academic_year" 
 					+ " left join kpi_perspective kp on kp.kpi_perspective_id = kpi.kpi_perspective_id" 
-					+ " order by kpi_structure_id,kpi.kpi_name";
+					+ " order by kpi.kpi_code";
 			
 			Query query = entityManager.createNativeQuery(sql);
 			if(query.getResultList().size()>0){
@@ -2510,7 +2537,8 @@ public class EduqaRepository   {
 
 
 		// =====[ START: CDS RESULT ]================================================================================//
-			public Integer saveCdsResult(CdsResult transientInstance)
+		 @Transactional(rollbackOn = Exception.class)	
+		 public Integer saveCdsResult(CdsResult transientInstance)
 					throws DataAccessException {
 				// check header
 				try{
@@ -2527,14 +2555,14 @@ public class EduqaRepository   {
 						rsHead.setResultRowNo(0);
 						rsHead.setTypeRow("header");
 						entityManager.persist(rsHead);
-						entityManager.flush();
+						//entityManager.flush();
 					} else {
 						CdsResult rsHead= results.get(0);
 						rsHead.setCdsValue(transientInstance.getCdsValue());
 						rsHead.setUpdatedBy(transientInstance.getUpdatedBy());
 						rsHead.setUpdatedDate(transientInstance.getUpdatedDate());
 						entityManager.merge(rsHead);
-						entityManager.flush();
+						//entityManager.flush();
 					}
 					
 					//check detail * 1 head --> n detail **
@@ -2550,7 +2578,7 @@ public class EduqaRepository   {
 						rsDetail.setResultRowNo(1);
 						rsDetail.setTypeRow("detail");
 						entityManager.persist(rsDetail);
-						entityManager.flush();
+						//entityManager.flush();
 					} else {
 						// nothing do.  support data case problem;
 						/*CdsResult rsDetail= resultsDetail.get(0);
@@ -2677,15 +2705,16 @@ public class EduqaRepository   {
 				}
 				if (result.getResultDetailId()==null) { // empty = insert , exist = update
 					entityManager.persist(transientInstance);
-					entityManager.flush();
+					//entityManager.flush();
 					return transientInstance.getResultDetailId();
 				} else {
 					transientInstance.setResultDetailId(result.getResultDetailId());
 					entityManager.merge(transientInstance);
-					entityManager.flush();
+					//entityManager.flush();
 					return transientInstance.getResultDetailId();
 				}
 			}
+			
 			
 			public Integer updateCdsResultDetail(CdsResultDetail transientInstance)
 					throws DataAccessException {
@@ -3083,7 +3112,7 @@ public class EduqaRepository   {
 	}
 	public List getKpiNameAll(){
 		List returns = new ArrayList();
-		String qStr = "SELECT kpi_id,concat(kpi_code,':',kpi_name) from kpi ";
+		String qStr = "SELECT kpi_id,concat(kpi_code,':',kpi_name) from kpi order by kpi_code";
 		
 		Query query = entityManager.createNativeQuery(qStr);
 		List<Object[]> results = query.getResultList();

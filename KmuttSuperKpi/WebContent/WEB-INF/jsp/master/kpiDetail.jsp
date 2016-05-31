@@ -111,6 +111,7 @@
 
 	       	getCriteraiMethod();
 	     	getSuperKpi(); 
+
 	    });
 
 	    function pageMessage(){
@@ -756,9 +757,10 @@
     			$.ajax({
         			dataType:'json',
         			url: "<%=doSaveFormula%>" ,
+        			async: false,
         			data: { 'kpiId':kpiId,'formula': formulaString,'desc':formulaDesc,'percent':percentFlag  } ,
         			success: function(data){
-        			//	alert(JSON.stringify(data));
+        				console.log(JSON.stringify(data));
         			}
         		});
     		}else{
@@ -1398,7 +1400,7 @@
     		vertical-align:text-top;
     	}
     	div.formula-calc{
-    		border:2px solid #bcbcbc;
+    		border:1px solid #bcbcbc;
     	}
     	.formula-calc{
     		padding:10px 10px 20px 10px;
@@ -1835,7 +1837,7 @@
 				</div>
 				<div class="formula-calc">
 					<label>สูตรการคำนวน</label><form:textarea id="formula" name="formula" path="kpiModel.formula" cols="70" rows="4" ></form:textarea>
-				</div>
+				</div> <br/>
 				<div style="text-align:center;"><input onclick="doSubmitFormula()" type="button" value="บันทึก" style="{margin-right:10px;}" class="save" />
 					<!-- <input type="button" onclick="doCloseAccordFormula" value="ปิด" /> -->
 				</div>

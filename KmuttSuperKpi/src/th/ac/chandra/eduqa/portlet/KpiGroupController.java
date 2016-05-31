@@ -114,6 +114,7 @@ public class KpiGroupController {
 			Model model) {
 		User user = (User) request.getAttribute(WebKeys.USER);
 		kpiGroupForm.getKpiGroupModel().setGroupId(null);
+		kpiGroupForm.getKpiGroupModel().setOrgTypeId(null);
 		kpiGroupForm.getKpiGroupModel().setAcademicYear(getCurrentYear());
 		kpiGroupForm.getKpiGroupModel().setCreatedBy(user.getFullName());
 		kpiGroupForm.getKpiGroupModel().setUpdatedBy(user.getFullName());
@@ -137,6 +138,7 @@ public class KpiGroupController {
 			BindingResult result, Model model) throws ParseException {
 		User user = (User) request.getAttribute(WebKeys.USER);
 		// kpiGroupForm.getKpiGroupModel().setId(null);
+		kpiGroupForm.getKpiGroupModel().setOrgTypeId(null);
 		kpiGroupForm.getKpiGroupModel().setAcademicYear(getCurrentYear());
 		kpiGroupForm.getKpiGroupModel().setUpdatedBy(user.getFullName());
 		String createStr = kpiGroupForm.getCreateDate();

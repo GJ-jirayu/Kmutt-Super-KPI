@@ -2,7 +2,9 @@ package th.ac.chandra.eduqa.portlet;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -195,13 +197,13 @@ public class KpiController {
 		}
 		model.addAttribute("uomList", uomList);
 		
-		Map<String,String> parentList = new HashMap<String,String>();
+		HashMap<String,String> parentList = new HashMap<String,String>();
 		List<DescriptionModel> parents = service.getKpiNameAll(new DescriptionModel());
-		parentList.put(null,"none");
+		parentList.put("0","none");
 		for(DescriptionModel parent: parents){
 			parentList.put(parent.getDescCode(),parent.getDescription());
 		}
-		model.addAttribute("parentList",parentList);
+		model.addAttribute("parentList", parentList);
 		
 		Map<String,String> criteriaTypeList = new HashMap<String,String>();
 		List<DescriptionModel> crTypes = service.getCriTypes(new DescriptionModel());
@@ -624,6 +626,7 @@ public class KpiController {
 		System.out.println(json.toString());
 		response.getWriter().write(json.toString());
 	} // end doDelete
+	
 	@ResourceMapping(value="doSaveFormula")
 	@ResponseBody 
 	public void saveFormula(ResourceRequest request,ResourceResponse response) 
@@ -648,6 +651,7 @@ public class KpiController {
 		System.out.println(json.toString());
 		response.getWriter().write(json.toString());
 	}
+	
 	@ResourceMapping(value="doSaveQuanBaseline")
 	@ResponseBody 
 	public void saveQuanBaseline(ResourceRequest request,ResourceResponse response) 
@@ -1052,6 +1056,7 @@ public class KpiController {
 			}
 		return ret;
 	}
+	
 	private String validParamString(Object param){
 		if(param instanceof Integer){
 			if(param==null){

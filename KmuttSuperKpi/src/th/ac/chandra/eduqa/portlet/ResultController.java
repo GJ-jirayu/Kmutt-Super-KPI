@@ -85,8 +85,7 @@ public class ResultController {
 	@Autowired
 	@Qualifier("eduqaServiceWSImpl")
 	private EduqaService service;
-	private String uploadDirectory = "/home/pwirun/app/Chandra/fileupload/UploadFile/";
-	//private String uploadDirectory = "/home/gj-jirayu/Liftray/App/Kmutt-Kpi/UploadFile";
+	private String uploadDirectory = "/home/gj-app-dev/kmutt/super-kpi/file-upload";
 	private String directoryDelimitor;
 	
 	@Autowired
@@ -188,10 +187,6 @@ public class ResultController {
 		model.addAttribute("universitys",uniList);
 		
 		Map<String,String> facList = new HashMap<String,String>();
-		/*List<DescriptionModel> facs = service.getFacultyAll(new DescriptionModel());
-		for(DescriptionModel fac : facs){
-			facList.put(fac.getDescCode(),fac.getDescription());
-		}*/
 		List<OrgModel> facs = service.getOrgFacultyOfUniversity(org);
 		for(OrgModel fac : facs){
 			facList.put(fac.getFacultyCode(),fac.getFacultyName());
@@ -205,11 +200,14 @@ public class ResultController {
 		}
 		model.addAttribute("courses",corsList);
 		
-		// retrive kpiResultList
+		// retrive kpiResultList // 
 		KpiResultModel kpiResultModel = new KpiResultModel();
 		kpiResultModel.setOrgId(org.getOrgId());
 		kpiResultModel.setMonthID(monthId);
 		kpiResultModel.setAcademicYear( CurrentCalendar.getAcademicYear());
+		kpiResultModel.setFiscalYear( CurrentCalendar.getAcademicYear());
+		kpiResultModel.setCalendarYear( CurrentCalendar.getAcademicYear());
+		kpiResultModel.setThMonthName( CurrentCalendar.getThMonthName());
 		kpiResultModel.setKpiGroupId(groupId);
 		Paging page = new Paging();
 		page.setPageNo(1);
@@ -653,8 +651,8 @@ public class ResultController {
 			@ModelAttribute("KpiResultForm") KpiResultForm form, BindingResult result, Model model) {
 		// response.setRenderParameter(arg0, arg1);
 		Integer level = form.getIdentify().getLevel();
-		String orgId = null;
-		if (level == 1) {
+		String orgId = form.getIdentify().getOrgId().toString();
+		/*if (level == 1) {
 			orgId = form.getIdentify().getUniversity();
 		} else if (level == 2) {
 			orgId = form.getIdentify().getFaculty();
@@ -663,7 +661,8 @@ public class ResultController {
 		}
 		if (orgId.isEmpty()) {
 			orgId = "0";
-		}
+		}*/
+		
 		// version 2 * academic > calendar , monthId > monthNo
 		SysMonthModel dm = new SysMonthModel();
 		dm.setCalendarYear(form.getCalendarYear());

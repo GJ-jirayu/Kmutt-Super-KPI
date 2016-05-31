@@ -53,6 +53,16 @@
     		function(e){
     			-1!==$.inArray(e.keyCode,[46,8,9,27,13,110,190])||/65|67|86|88/.test(e.keyCode)&&(!0===e.ctrlKey||!0===e.metaKey)||35<=e.keyCode&&40>=e.keyCode||(e.shiftKey||48>e.keyCode||57<e.keyCode)&&(96>e.keyCode||105<e.keyCode)&&e.preventDefault()
     		});
+
+    	// Set default cds level //
+    	if("${pageAction}" == "new"){
+    		elRadioCdsLevel = $("input.cdsLevel");
+    		elRadioCdsLevel.each(function( index ) {    			
+    			if(index == 0){
+    				$(this).prop("checked", true);
+    			}
+			});
+    	}
     });
     //bind event
     function message(){
@@ -500,7 +510,7 @@
 							<thead>
 								<tr>
 									<!-- <td> <span style="font-weight:bold"> ข้อมูลพื้นฐาน </span> </td> -->
-									<td><form:input type="hidden" path="cdsModel.cdsId" /></td>
+									<td><form:input id="inCdsId" type="hidden" path="cdsModel.cdsId"/></td>
 									<td><form:input type="hidden" path="cdsModel.createdBy" /></td>
 									<td><form:input type="hidden" path="cdsModel.createdDate" /></td>
 								</tr>
@@ -512,7 +522,9 @@
 								</tr>
 								<tr>
 									<td>ระดับข้อมูลพื้นฐาน :</td>
-									<td> <form:radiobuttons path="cdsModel.levelId" items="${levelList}"/> </td>
+									<td> 
+					                	<form:radiobuttons class="cdsLevel" path="cdsModel.levelId" items="${levelList}"/>
+					                </td>
 								</tr>
 								<tr>
 									<td>คำอธิบาย :</td>
@@ -620,7 +632,7 @@
 										<table id="queryAttribute">
 											<tr><td>คอลัมน์ผลลัพธ์ข้อมูลพื้นฐาน	</td><td><form:select id="valueField" class="ckSqlFlag" path="cdsModel.valueField"> <form:options items="${qValueList}" /></form:select></td></tr>
 											<tr><td>คอลัมน์สถาบัน </td><td><form:select id="uniField" class="ckSqlFlag" path="cdsModel.universityField"><form:options items="${qUniList}" /></form:select></td></tr>
-									/		<tr><td>คอลัมน์คณะ </td><td><form:select id="facultyField" class="ckSqlFlag" path="cdsModel.facultyField"><form:options items="${qFacultyList}" /></form:select></td></tr>
+											<tr><td>คอลัมน์คณะ </td><td><form:select id="facultyField" class="ckSqlFlag" path="cdsModel.facultyField"><form:options items="${qFacultyList}" /></form:select></td></tr>
 											<tr><td>คอลัมน์หลักสูตร	</td><td><form:select id="courseField" class="ckSqlFlag" path="cdsModel.courseField"><form:options items="${qCourseList}" /></form:select></td></tr>
 											<tr><td>คอลัมน์ข้อมูลสนับสนุน </td><td><form:select id="detailField" class="ckSqlFlag" path="cdsModel.detailField"><form:options items="${qDetailList}" /></form:select></td></tr>
 											<tr><td>คอลัมน์ปีปฏิทิน	</td><td><form:select id="yearField" class="ckSqlFlag" path="cdsModel.yearField"><form:options items="${qYearList}" /></form:select></td></tr>
