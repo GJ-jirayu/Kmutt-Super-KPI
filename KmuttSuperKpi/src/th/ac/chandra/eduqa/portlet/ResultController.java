@@ -115,7 +115,7 @@ public class ResultController {
 		// ini Param
 		String UserOrgId = "1";
 		Integer monthId = 0;
-		Integer groupId = null;
+		Integer groupId = 0;
 		//  initial param
 		SysYearModel sy = service.getSysYear();
 		if(request.getParameter("month")!=null){
@@ -168,6 +168,7 @@ public class ResultController {
 		Map<Integer,String> groups = new HashMap<Integer,String>();
 		KpiGroupModel groupM = new KpiGroupModel();
 		List<KpiGroupModel> resultGroups = service.searchKpiGroup(groupM);
+		groups.put(0, "ทุกเป้าประสงค์");
 		for(KpiGroupModel group : resultGroups){
 			groups.put(group.getGroupId(),group.getGroupShortName());
 		}
@@ -295,7 +296,7 @@ public class ResultController {
 		response.setRenderParameter("orgId", String.valueOf(form.getOrgId()) );
 		response.setRenderParameter("kpiId", String.valueOf(form.getKpiId()) );
 		response.setRenderParameter("monthId", String.valueOf(form.getMonthId() ) );
-		response.setRenderParameter("cdsId", String.valueOf(form.getSelectCdsId() ) );	
+		response.setRenderParameter("cdsId", String.valueOf(form.getSelectCdsId() ) );
 	}
 	@RequestMapping("VIEW")
 	@RenderMapping(params="render=assignResultQuantity")
@@ -359,8 +360,16 @@ public class ResultController {
 		if(cdsResult.getCdsValue()!=null){
 			resultForm.setCdsValue( Double.parseDouble(cdsResult.getCdsValue()));
 		}
-		resultForm.setYearName("ปีการศึกษา");
-		resultForm.setYearNo("2558");
+		
+		// Set Year and Year Name //
+		KpiModel kpiDetail = new KpiModel();
+		DescriptionModel calendarTypes = new DescriptionModel();
+		kpiDetail = service.findKpiById(kpiId);			
+		calendarTypes.setDescCode(kpiDetail.getCalendarTypeId().toString());
+		List<DescriptionModel> calendarTypeLists = service.getCalendarTypeById(calendarTypes);
+		resultForm.setYearName(calendarTypeLists.get(0).getDescription());
+		resultForm.setYearNo(kpiDetail.getAcademicYear().toString());
+		
 		SysMonthModel monthM = new SysMonthModel();
 		monthM.setMonthId(monthId);
 		monthM = service.findSysMonthById(monthId);
@@ -371,6 +380,7 @@ public class ResultController {
 		
 		return "dataEntry/result";
 	}
+	
 	@RequestMapping(params="action=doBackFromQuantity")
 	public void doBackFromQuantity(javax.portlet.ActionRequest request, javax.portlet.ActionResponse response
 			,@ModelAttribute("ResultQuantityForm") ResultQuantityForm form,BindingResult result,Model model){

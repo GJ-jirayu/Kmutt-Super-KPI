@@ -152,7 +152,24 @@ public class EduqaRepository   {
 		transList.add(String.valueOf(count));
 		return transList;
 	}
-
+	
+	//#####[ START: Calendar Type ]#############################################################################//
+	public List findCalendarTypeById(DescriptionModel model)
+			throws DataAccessException {
+		List returns = new ArrayList();
+		Query query = entityManager.createNativeQuery(
+				"select calendar_type_id, calendar_type_name from calendar_type where calendar_type_id = "+model.getDescCode()
+				);
+		List<Object[]> results = query.getResultList();
+		for(Object[] result: results){
+			DescriptionModel mod = new DescriptionModel();
+			mod.setDescCode( String.valueOf((Integer)result[0]));
+			mod.setDescription( (String)result[1]);
+			returns.add(mod);
+		}
+		return returns;
+	}
+	//#####[ END: Calendar Type ]#############################################################################//
 	
 	//#####[ START: Kpi Perspective ]###########################################################################//
 	public Integer saveKpiPerspective(KpiPerspective transientInstance) throws DataAccessException {
@@ -2136,19 +2153,26 @@ public class EduqaRepository   {
 
 		public List searchKpiResult(KpiResult domain, Paging pagging,
 				String keySearch, String[] otherKeySearch) throws DataAccessException {
+			
+			// Set group condition //
+			String groupCondi = "";
+			if(domain.getKpiGroupId() != 0){
+				groupCondi = " and kpi_group_id = "+domain.getKpiGroupId();
+			}
 			ArrayList transList = new ArrayList();
 			String sql = "select kr.kpi_structure_id,kr.kpi_structure_name ,kr.kpi_id,kr.kpi_group_name,kr.kpi_name "
 					+ "	,kr.calendar_type_name,kr.period_name,kpi_uom_name ,kr.target_value"
 					+ " ,kr.actual_value "
 					+ " ,(select count(*)from kpi_result_detail where result_id = kr.result_id and action_flag = 1) as totalAction  "
 					+ " ,kr.criteria_type_id "
+					+ " ,kr.kpi_code "
 					+ " from  kpi_result kr  "
 					+ " where org_id = "+domain.getOrgId()
-					+ " and kpi_group_id = "+domain.getKpiGroupId()
+					+ groupCondi
 					+ " and ((academic_year = "+domain.getAcademicYear()+" and th_month_name = '"+domain.getThMonthName()+"')"
 					+ "or (fiscal_year = "+domain.getFiscalYear()+" and th_month_name = '"+domain.getThMonthName()+"')"
 					+ "or (calendar_year = "+domain.getCalendarYear()+" and th_month_name = '"+domain.getThMonthName()+"'))"
-					+ " order by kr.kpi_structure_id,kr.kpi_name";
+					+ " order by kr.kpi_structure_id,kr.kpi_code";
 			Query query = entityManager.createNativeQuery(sql);
 			//query.setFirstResult((pagging.getPageNo() - 1) * pagging.getPageSize());
 			//query.setMaxResults(pagging.getPageSize());
@@ -2166,6 +2190,7 @@ public class EduqaRepository   {
 				model.setPeriodName((String) result[6]);
 				model.setKpiUomName((String) result[7]);
 				model.setCriteriaTypeId((Integer)result[11]);
+				model.setKpiCode((String)result[12]);
 				if(result[8]==null){
 					model.setTargetValue(null);
 				}else{
@@ -2224,12 +2249,9 @@ public class EduqaRepository   {
 					+ "		(select max(kpi_weight) from kpi_result kr where kr.kpi_id = kpi.kpi_id)"
 					+ " from ("
 					+ "		select * from kpi "
-					+ "		where academic_year="+model.getAcademicYear()
-					+ "		and kpi_level_id="+model.getKpiLevelId()
+					+ "		where kpi_level_id="+model.getKpiLevelId()
 					+ " "+critPerspectiveStr
 					+ " "+critGroupStr
-					//+ "		and kpi_perspective_id="+model.getKpiPerspectiveId()
-					//+ "		and kpi_group_id = "+model.getKpiGroupId()
 					+ "	) kpi"
 					+ " left join kpi_structure ks on ks.kpi_structure_id = kpi.kpi_structure_id"
 					+ " 	and ks.academic_year = kpi.academic_year"  

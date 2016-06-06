@@ -519,8 +519,8 @@
               <form:options items="${months}" />
           </form:select>
         </div>
-        <div class="boxFilter span2" >
-          <span>กลุ่มตัวบ่งชี้:</span>
+        <div class="boxFilter span3" >
+          <span>เป้าประสงค์:</span>
           <form:select id="paramGroup"  class="filterGroup input-small" path="groupId">
             <form:options items="${groups}" />
           </form:select>
@@ -577,7 +577,7 @@
                     <th style="display:none">รหัสตัวบ่งชี้</tืh>
                     <th style="display:none">รหัสตัวบ่งชี้</th>
                     <th>สถานะตัวบ่งชี้</th>
-                    <th>กลุ่มตัวบ่งชี้</th>
+                    <th>เป้าประสงค์</th>
                     <th>ชื่อตัวบ่งชี้</th>
                     <th>ประเภทปฏิทิน</th>
                     <th>ช่วงเวลา</th>
@@ -602,7 +602,7 @@
                   </c:choose>
                         </td>
                         <td>${chandraFn:nl2br(kpiResult.kpiGroupName)}</td>  
-                        <td>${chandraFn:nl2br(kpiResult.kpiName)}</td>  
+                        <td>${kpiResult.kpiCode}-${chandraFn:nl2br(kpiResult.kpiName)}</td>  
                         <td>${chandraFn:nl2br(kpiResult.calendarTypeName)}</td> 
                         <td>${chandraFn:nl2br(kpiResult.periodName)}</td>
                         <td>${chandraFn:nl2br(kpiResult.kpiUomName)}</td>  

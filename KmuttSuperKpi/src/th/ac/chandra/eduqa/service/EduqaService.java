@@ -232,6 +232,7 @@ public interface EduqaService {
 	public List getPeriods(DescriptionModel Model);
 	public List getUoms(DescriptionModel Model);
 	public List getCalendarTypes(DescriptionModel Model );
+	public List getCalendarTypeById(DescriptionModel model);
 	public List getCriTypes(DescriptionModel Model);
 	public List getCriMethods(DescriptionModel Model);
 	public List getKpiNameAll(DescriptionModel Model);

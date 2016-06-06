@@ -264,4 +264,6 @@ public class ServiceConstant {
 		public static final String KPI_RESULT_DELETE_BY_KPIID = "deleteKpiResultByKpiId";
 		public static final String RANGE_BASELINE_DELETE_BY_KPIID = "deleteRangeBaselineByKpiId";
 		
+		public static final String DESC_CALENDAR_TYPE_BY_ID = "findCalendarTypeById";
+		
 }

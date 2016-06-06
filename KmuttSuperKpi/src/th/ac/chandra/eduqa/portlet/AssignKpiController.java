@@ -309,6 +309,8 @@ public class AssignKpiController {
 		response.setRenderParameter("kpiId", String.valueOf(kpiListForm.getKpiId()));
 		response.setRenderParameter("orgId", String.valueOf(kpiListForm.getOrgId()));
 	}
+	
+	@SuppressWarnings("unchecked")
 	@RequestMapping("VIEW")
 	@RenderMapping(params="render=showTarget")
 	public String displayTarget(PortletRequest request,Model model){
@@ -380,8 +382,7 @@ public class AssignKpiController {
 	
 	@RequestMapping(params = "action=doSearch") 
 	public void actionSearch(javax.portlet.ActionRequest request, javax.portlet.ActionResponse response,
-			@ModelAttribute("kpiListForm") KpiListForm kpiListForm,BindingResult result,Model model) { 
-		User user = (User) request.getAttribute(WebKeys.USER);
+			@ModelAttribute("kpiListForm") KpiListForm kpiListForm,BindingResult result,Model model) {
 		String keySearch=kpiListForm.getKeySearch();
 		response.setRenderParameter("render", "listSearch");
 		response.setRenderParameter("keySearch", keySearch);
@@ -456,7 +457,6 @@ public class AssignKpiController {
 		JSONObject json = JSONFactoryUtil.createJSONObject();
 		JSONObject header = JSONFactoryUtil.createJSONObject();
 		JSONObject content = JSONFactoryUtil.createJSONObject();
-		List<HashMap<Integer,Integer>> lists = new ArrayList();
 		HashMap<Integer,Double> ls = new HashMap<Integer,Double>();
 		if( normalRequest.getParameter("m1") !="0" && normalRequest.getParameter("m1")!=""  ){
 			ls.put(1,Double.parseDouble(normalRequest.getParameter("m1")) );
@@ -526,25 +526,9 @@ public class AssignKpiController {
 		}
 		return str;
 	}
-	private List<String> getOrganizeObject(HierarchyAuthorityForm form){
-		List<String> ret = new ArrayList<String>();
-		String level = null;
-		String org = null;
-		if(form.getLevel().equals(1)){
-			level = "1";
-			org = String.valueOf(form.getUniversity());
-		}else if(form.getLevel().equals(2)){
-			level = "2";
-			org = String.valueOf(form.getFaculty());
-		}else if(form.getLevel().equals(3)){
-			level = "3";
-			org = String.valueOf(form.getCourse());
-		}
-		ret.add(level);
-		ret.add(org);
-		return  ret;
-	}
+
 	//  #### ajaax
+	@SuppressWarnings("unchecked")
 	@ResourceMapping(value="doSearchOrg")
 	@ResponseBody 
 	public void searchOrgByLevel(ResourceRequest request,ResourceResponse response) 
@@ -739,7 +723,6 @@ public class AssignKpiController {
 		JSONObject json = JSONFactoryUtil.createJSONObject();
 		JSONObject header = JSONFactoryUtil.createJSONObject();
 		JSONObject content = JSONFactoryUtil.createJSONObject();
-		 JSONArray orgList = JSONFactoryUtil.createJSONArray();
 		String status = "";
 		Integer success = 0;
 		List<Integer> activeKpiIds = new ArrayList<Integer>();
@@ -753,6 +736,7 @@ public class AssignKpiController {
 				KpiResultModel resultModel = new KpiResultModel();
 				resultModel.setOrgId(orgM.getOrgId());
 				resultModel.setKpiLevelId(orgM.getLevelId());
+				@SuppressWarnings("unchecked")
 				List<KpiResultModel> resultKpis = service.searchKpiResultWithActiveKpi(resultModel);
 				for( KpiResultModel result : resultKpis){
 					if(result.getResultId()>0){
@@ -777,8 +761,6 @@ public class AssignKpiController {
 	@ResponseBody
 	public void dofindOrgByUserName(ResourceRequest request, ResourceResponse response) throws IOException {
 		JSONObject json = JSONFactoryUtil.createJSONObject();
-		HttpServletRequest httpReq = PortalUtil.getHttpServletRequest(request);
-		HttpServletRequest normalRequest = PortalUtil.getOriginalServletRequest(httpReq);
 	
 		User user = (User) request.getAttribute(WebKeys.USER);
 		DescriptionModel userOrg = new DescriptionModel();
@@ -825,7 +807,6 @@ public class AssignKpiController {
 		userOrg.setDescription(user.getScreenName());
 		userOrg = service.getOrgOfUser(userOrg);
 		String UserOrgId = userOrg.getDescCode();
-		OrgModel orgByUser = service.findOrgById(org);
 		connJSON.put("userRoleOrgId", UserOrgId);
 		
         lists.put(connJSON);
@@ -857,6 +838,7 @@ public class AssignKpiController {
 		orgModel.setUniversityCode(university);
 		//orgModel.setOtherKeySearch(otherKeySearch);
 				
+		@SuppressWarnings("unchecked")
 		List<OrgModel> details = service.getOrgFacultyOfUniversity(orgModel);
 		JSONArray lists = JSONFactoryUtil.createJSONArray();
 		for(OrgModel detail:details ){
@@ -892,6 +874,7 @@ public class AssignKpiController {
 		orgModel.setUniversityCode(uniCode);
 		orgModel.setFacultyCode(facultyCode);
 		
+		@SuppressWarnings("unchecked")
 		List<OrgModel> details = service.getOrgCourseOfFaculty(orgModel);
 		 JSONArray lists = 	JSONFactoryUtil.createJSONArray();
 		for(OrgModel detail:details ){

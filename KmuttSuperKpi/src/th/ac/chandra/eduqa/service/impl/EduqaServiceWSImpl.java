@@ -1607,6 +1607,12 @@ public class EduqaServiceWSImpl extends PostCommon  implements EduqaService{
 			this.resultPage = Integer.parseInt(imakeMessage.getLastpage());
 			return imakeMessage.getResultListObj();
 		}
+		public List getCalendarTypeById(DescriptionModel model){
+			model.setServiceName(ServiceConstant.DESC_CALENDAR_TYPE_BY_ID);
+			ImakeResultMessage imakeMessage = postMessage(model, model.getClass().getName(), "descriptionModel", true);
+			this.resultPage = Integer.parseInt(imakeMessage.getLastpage());
+			return imakeMessage.getResultListObj();
+		}
 		public List getCriTypes(DescriptionModel Model){
 			Model.setServiceName(ServiceConstant.DESC_CRITERIA_TYPE);
 			ImakeResultMessage imakeMessage = postMessage(Model,		Model.getClass().getName(), "descriptionModel", true);

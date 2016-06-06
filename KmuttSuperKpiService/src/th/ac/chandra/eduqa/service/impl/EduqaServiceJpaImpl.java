@@ -960,6 +960,12 @@ public class EduqaServiceJpaImpl  implements EduqaService {
 	public List getCriteriaTypeAll(DescriptionModel model){
 		return repository.getCriteriaTypeAll(model);
 	}
+	
+	@Override
+	public List getCalendarTypeById(DescriptionModel model){
+		return repository.findCalendarTypeById(model);
+	}
+	
 	@Override
 	public List getCriteriaMethodAll(DescriptionModel model){
 		return repository.getCriteriaMethodAll(model);

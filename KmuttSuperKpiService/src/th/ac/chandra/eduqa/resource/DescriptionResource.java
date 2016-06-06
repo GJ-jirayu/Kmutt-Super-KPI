@@ -97,6 +97,14 @@ public class DescriptionResource extends BaseResource {
 							}
 							return getRepresentation(entity, imakeMessage, xstream);
 						}
+						else if(serviceName.equals(ServiceConstant.DESC_CALENDAR_TYPE_BY_ID)){
+							ImakeResultMessage imakeMessage = new ImakeResultMessage();
+							List crType = service.getCalendarTypeById(xsource);
+							if(crType!=null){
+								imakeMessage.setResultListObj(crType);
+							}
+							return getRepresentation(entity, imakeMessage, xstream);
+						}
 						else if(serviceName.equals(ServiceConstant.DESC_CRITERIA_METHOD)){
 							ImakeResultMessage imakeMessage = new ImakeResultMessage();
 							List crMethod = service.getCriteriaMethodAll(xsource);
