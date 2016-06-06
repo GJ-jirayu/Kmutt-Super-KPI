@@ -85,6 +85,7 @@ public class ResultController {
 	@Autowired
 	@Qualifier("eduqaServiceWSImpl")
 	private EduqaService service;
+	//private String uploadDirectory = "/home/portal/super-kpi/file-upload";
 	private String uploadDirectory = "/home/gj-app-dev/kmutt/super-kpi/file-upload";
 	private String directoryDelimitor;
 	

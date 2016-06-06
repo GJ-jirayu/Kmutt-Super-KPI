@@ -33,7 +33,7 @@
 	<link rel="stylesheet" href="<c:url value="/resources/css/common-element.css"/>" type="text/css"/>
 	
     <script type="text/javascript"> 
-   	  	var dialog,dialog2,gobalGroupStName, gobalGroupName, gobalGroupType;
+   	  	var dialog,dialog2,globalGroupStName, globalGroupName, globalGroupType;
     	$( document ).ready(function() {
     		paging();
     		$('.numPage').val(${PageCur});
@@ -130,9 +130,9 @@
    	 		var currentName = $("input#fGroupName").val(); 
    	 		var currentStName = $("input#fGroupStName").val();
    	 		var currentGroup = $("select#fGroupType").val();
-   	 		if($.trim(gobalGroupName) == $.trim(currentName) 
-   	 			&& $.trim(gobalGroupStName) == $.trim(currentStName)
-   	 			&& $.trim(gobalGroupType) == $.trim(currentGroup)){
+   	 		if($.trim(globalGroupName) == $.trim(currentName) 
+   	 			&& $.trim(globalGroupStName) == $.trim(currentStName)
+   	 			&& $.trim(globalGroupType) == $.trim(currentGroup)){
    	 			actCancel();
    	 		}else{
    	 			console.log("Saveee");
@@ -160,9 +160,9 @@
 	 			$(d1).find('select#fOrgType').val(valDesc["orgId"]);
 	   			$(d1).find('select#fGroupType').val(valDesc["groupType"]);
 	 		}
-	   		gobalGroupName = valDesc["name"]; 
-	   		gobalGroupStName = valDesc["shortName"];
-	   		gobalGroupType = valDesc["groupType"];
+	   		globalGroupName = valDesc["name"]; 
+	   		globalGroupStName = valDesc["shortName"];
+	   		globalGroupType = valDesc["groupType"];
 
    	 		$(d1).find('span').html(head);
    	 		$(d1).find('input[type=hidden]#fGroupId').val(rowNum);

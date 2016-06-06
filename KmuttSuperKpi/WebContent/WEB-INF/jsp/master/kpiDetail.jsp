@@ -262,7 +262,7 @@
 			if(elCount == 0){ doSubmitDetail(); }else{ alert("กรุณากรอกข้อมูลให้ครบถ้วน!!");}
 		}
 
-    	function doSubmitDetail(){ console.log("-->"+criteriaMethodId+": "+$("#criteriaMethod").val());
+    	function doSubmitDetail(){ 
     		if(levelId != $("#detailLevel").val()
 				||calendarTypeId != $("#detailCalendarType").val()
 				||periodId != $("#detailPeriod").val()
@@ -1375,6 +1375,7 @@
 				}
 			});
 		}
+		
 		function actAdd(){
 			$('#kpiFormDetail').attr("action","<%=actionNew%>");
 			$('#kpiFormDetail').submit();			

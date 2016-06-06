@@ -10,10 +10,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
-import javassist.expr.NewArray;
 import th.ac.chandra.eduqa.domain.BaselineQuan;
 import th.ac.chandra.eduqa.domain.BaselineRange;
 import th.ac.chandra.eduqa.domain.BaselineSpec;
@@ -1375,7 +1372,7 @@ public class EduqaRepository   {
 				" ,cr.academic_year,cr.running_no "+
 				" ,cr.criteria_group_detail_id as group_id,detail_name as group_name" +
 				" ,cr.kpi_id ,cr.cds_id "+
-				" FROM eduqa.qualitative_criteria cr "+  
+				" FROM qualitative_criteria cr "+  
 				" left join criteria_group_detail gd "+
 				" on cr.criteria_group_detail_id = gd.criteria_group_detail_id "+
 				" where kpi_id = "+kpiId+
@@ -1522,8 +1519,8 @@ public class EduqaRepository   {
 	public List listSpecBaselineGroup(BaselineSpec spec){
 		Query query =  entityManager.createNativeQuery(
 				" select sb.criteria_group_detail_id ,cgd.detail_name "+
-				" FROM eduqa.specified_baseline sb "+
-				" left join eduqa.criteria_group_detail cgd "+
+				" FROM specified_baseline sb "+
+				" left join criteria_group_detail cgd "+
 				" on cgd.criteria_group_detail_id = sb.criteria_group_detail_id "+
 				" where kpi_id = " + spec.getKpiId() +
 				" group by sb.criteria_group_detail_id " );
@@ -2143,7 +2140,7 @@ public class EduqaRepository   {
 			String sql = "select kr.kpi_structure_id,kr.kpi_structure_name ,kr.kpi_id,kr.kpi_group_name,kr.kpi_name "
 					+ "	,kr.calendar_type_name,kr.period_name,kpi_uom_name ,kr.target_value"
 					+ " ,kr.actual_value "
-					+ " ,(select count(*)from eduqa.kpi_result_detail where result_id = kr.result_id and action_flag = 1) as totalAction  "
+					+ " ,(select count(*)from kpi_result_detail where result_id = kr.result_id and action_flag = 1) as totalAction  "
 					+ " ,kr.criteria_type_id "
 					+ " from  kpi_result kr  "
 					+ " where org_id = "+domain.getOrgId()
@@ -3056,7 +3053,7 @@ public class EduqaRepository   {
 	}
 	public List getUomAll(DescriptionModel model)	throws DataAccessException {
 		List uoms = new ArrayList();
-		Query query = entityManager.createNativeQuery("SELECT kpi_uom_id,kpi_uom_name FROM eduqa.kpi_uom;");
+		Query query = entityManager.createNativeQuery("SELECT kpi_uom_id,kpi_uom_name FROM kpi_uom;");
 		List<Object[]> results = query.getResultList();
 		for(Object[] result: results){
 			DescriptionModel uom = new DescriptionModel();
@@ -3081,7 +3078,7 @@ public class EduqaRepository   {
 	public List getCriteriaTypeAll(DescriptionModel model)	throws DataAccessException {
 		List returns = new ArrayList();
 		Query query = entityManager.createNativeQuery(
-				"SELECT criteria_type_id, criteria_type_name FROM eduqa.criteria_type "
+				"SELECT criteria_type_id, criteria_type_name FROM criteria_type "
 				);
 		List<Object[]> results = query.getResultList();
 		for(Object[] result: results){
@@ -3098,7 +3095,7 @@ public class EduqaRepository   {
 		if( model.getGroupId()!=null){
 			sb.append(" where criteria_type_id = "+ model.getGroupId());
 		}
-		String qStr = "SELECT criteria_method_id,criteria_method_name FROM eduqa.criteria_method "+sb.toString();
+		String qStr = "SELECT criteria_method_id,criteria_method_name FROM criteria_method "+sb.toString();
 		
 		Query query = entityManager.createNativeQuery(qStr);
 		List<Object[]> results = query.getResultList();
