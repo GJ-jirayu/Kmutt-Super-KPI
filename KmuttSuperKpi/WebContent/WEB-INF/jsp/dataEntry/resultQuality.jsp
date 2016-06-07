@@ -379,12 +379,12 @@
       <table id="cdsListDetail" style="width:100%">
         <thead>
           <tr>
-            <th width="5%">รหัส</th>
+            <th width="10%">รหัส</th>
             <!-- <th width="10%">รายงานผล</th> -->
-            <th width="5%">มี</th>
+            <th width="10%">มี</th>
             <th width="50%">เกณฑ์การประเมิน</th>
-            <th width="20%">ผลการดำเนินงาน</th>
-            <th width="10%">รายการหลักฐาน</th>
+            <th width="" style="display: none;">ผลการดำเนินงาน</th>
+            <th width="20%">รายการหลักฐาน</th>
           </tr>
         </thead>
         <tbody>
@@ -408,7 +408,7 @@
 					</c:choose>
                 </td>
 				<td>${chandraFn:nl2br(result.standardName)}</td>  
-				<td>${result.cdsValue}</td>
+				<td style="display: none;">${result.cdsValue}</td>
 				<td style="text-align:center;"> 
 				<c:choose>
 					<c:when test="${result.hasResult=='1'}">

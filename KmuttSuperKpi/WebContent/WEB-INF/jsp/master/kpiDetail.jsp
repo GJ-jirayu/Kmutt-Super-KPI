@@ -726,6 +726,7 @@
     		}
 
     		getCriteraiMethod();
+    		toggleBaselineLayout()
     	}
     	function clearCnt(jCnt){
     		if(typeof jCnt != 'undefined'){
@@ -1619,7 +1620,7 @@
 										<td>เกณฑ์มาตราฐาน</td>
 										<td><textarea style="width:90%"  rows="3"></textarea></td>
 									</tr>
-									<tr>
+									<tr style="display:none;">
 										<td>กลุ่ม </td>
 										<td>
 											<select id="crGroup" onchange="crGroupChange(this,'crGroupItem')">
@@ -1638,7 +1639,7 @@
 											</select>
 										</td>
 									</tr>
-									<tr>
+									<tr style="display:none;">
 										<td>ข้อมูลพื้นฐาน </td>
 										<td><input type="text"/></td>
 									</tr>

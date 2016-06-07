@@ -1000,7 +1000,8 @@ public class EduqaRepository   {
 		" ,kpi.kpi_code "+
 		" ,kp.kpi_perspective_id "+
 		" ,kp.kpi_perspective_name "+
-		" ,g.kpi_group_id "+
+		" ,g.kpi_group_id "+ 
+		" ,kpi.parent_kpi_id "+
 		" from kpi "+
 		" left join kpi_group g on kpi.kpi_group_id = g.kpi_group_id "+
 		" left join kpi_structure s on s.kpi_structure_id = kpi.kpi_structure_id "+
@@ -1033,6 +1034,7 @@ public class EduqaRepository   {
 		    kpi.setKpiPerspectiveId((Integer)result[11]);
 		    kpi.setKpiPerspectiveName((String)result[12]);
 		    kpi.setGroupId((Integer)result[13]);
+		    kpi.setParentId((Integer) result[14]);
 		    kpis.add(kpi);
 		}
 		ArrayList transList = new ArrayList();
@@ -1864,7 +1866,7 @@ public class EduqaRepository   {
 		query.setFirstResult((pagging.getPageNo() - 1) * pagging.getPageSize());
 		query.setMaxResults(pagging.getPageSize());
 		transList.add(query.getResultList());
-		System.out.print("mid:"+ ((SysMonth)  query.getResultList().get(0)).getMonthId() );
+		//System.out.print("mid:"+ ((SysMonth)  query.getResultList().get(0)).getMonthId() );
 		query = entityManager.createQuery("select count(p) from SysMonth p "
 				+ sb.toString());
 		long count = (Long) query.getSingleResult();
@@ -2246,7 +2248,8 @@ public class EduqaRepository   {
 					+ " 	group by kpi_id) as targetvalue,"
 					+ " 	kpi.kpi_perspective_id,"
 					+ " 	kp.kpi_perspective_name,"
-					+ "		(select max(kpi_weight) from kpi_result kr where kr.kpi_id = kpi.kpi_id)"
+					+ "		(select max(kpi_weight) from kpi_result kr where kr.kpi_id = kpi.kpi_id),"
+					+ "		kpi.parent_kpi_id"
 					+ " from ("
 					+ "		select * from kpi "
 					+ "		where kpi_level_id="+model.getKpiLevelId()
@@ -2283,6 +2286,7 @@ public class EduqaRepository   {
 					km.setKpiPerspectiveId((Integer)result[10]);
 					km.setKpiPerspectiveName((String)result[11]);
 					km.setKpiWeight( (result[12] != null ? Double.parseDouble(result[12].toString()) : 0.00) );
+					km.setParentKpiId((Integer) result[13]);
 					kms.add(km);
 				}
 			}
@@ -2402,10 +2406,10 @@ public class EduqaRepository   {
 
 					Query verifyKpiResultQuery = entityManager.createNativeQuery(verifyKpiResult);
 					Integer rowSize = verifyKpiResultQuery.getResultList().size();
-					System.out.println("\n Kpi Id: "+kid+", Row size: "+rowSize+"\n");
+					//System.out.println("\n Kpi Id: "+kid+", Row size: "+rowSize+"\n");
 					
 					// กรณียังไม่มี result ทำการ insert ทั้ง 12 เดือน //
-					if(rowSize == 0){ System.out.println("\n Insert Only! \n");
+					if(rowSize == 0){ //System.out.println("\n Insert Only! \n");
 						// Distribute month 1-12 //
 						for(Integer i = 1;i<=12;i++){
 							KpiResult mm = new KpiResult();
@@ -2437,7 +2441,7 @@ public class EduqaRepository   {
 					}
 					
 					/*มี result แต่ไม่ครบ 12 เดือน ทำการลบข้อมูลเก่าออก แล้วบันทึกใหม่ทั้ง 12 เดือน โดยมี active = 1*/
-					else if(rowSize > 0 && rowSize < 12){ System.out.println("\n Delete and Insert \n");
+					else if(rowSize > 0 && rowSize < 12){ //System.out.println("\n Delete and Insert \n");
 						String sql = "delete from kpi_result "
 								+" WHERE org_id="+model.getOrgId()
 								+" and kpi_id = "+kid+" ";
@@ -2482,7 +2486,7 @@ public class EduqaRepository   {
 					}
 					
 					/* มี result อยู่แล้วและครบ 12 เดือน ทำการ updata active = 1 และ update weight ใหม่*/ 
-					else if(rowSize >= 12){ System.out.println("\n Update Only. \n");
+					else if(rowSize >= 12){ //System.out.println("\n Update Only. \n");
 						String sql = "update kpi_result set active = 1, kpi_weight = "+weight+" "
 								+" WHERE org_id="+model.getOrgId()								
 								+" and kpi_id = "+kid;
@@ -2502,7 +2506,7 @@ public class EduqaRepository   {
 				entityManager.flush();
 			}catch(Exception ex){
 				success = 0;
-				System.out.print("\n Exception: "+ex.getMessage()+"\n");
+				//System.out.print("\n Exception: "+ex.getMessage()+"\n");
 				ex.printStackTrace();
 			}
 			return success ;

@@ -297,21 +297,85 @@
    	 		/*ทำการวนหา kpi ที่ถูกเลือกและดึงค่าถ่วงน้ำหนักมาคำนวนดูว่ารวมกันแล้วเท่ากับหนึ่งร้อยหรือไม่*/
    	 		/*และทำการส่งค่าถ่วงน้ำหนัก ไปทำการบันทึกลงตาราง*/
    	 		var currentWeightValArr = [];
+   	 		var childClassArr = [];
    	 		var sumValue = null;
    	 		$("#assignKpi_accordion table.tableGridLv>tbody>tr").each(function(){
-   	 			if($(this).children("td:nth-child(2)").children('input[type="checkbox"]').is(':checked')){ 				
-   	   	 			var values = $(this).children("td:nth-child(7)").children('input[type="number"]').val();
-   	   	 			var kpiIds = $(this).children("td:nth-child(1)").html();
+   	 			var elNormal = $(this).children("td:nth-child(2)").children('input[type="checkbox"]');
+   	 			var elParent = $(this).children("td:nth-child(2)").children('input[type="checkbox"].parent');
+   	 			var elChild = $(this).children("td:nth-child(2)").children('input[type="checkbox"].child');
+   	 			var values = $(this).children("td:nth-child(7)").children('input[type="number"]').val();
+   	   	 		var kpiIds = $(this).children("td:nth-child(1)").html();
+
+   	   	 		// Get kpi selected: ดึง kpi_id และ value ทั้งหมดตามที่ user ลเือก //
+   	   	 		if(elNormal.is(':checked')){
    	   	 			currentWeightValArr.push($.trim(kpiIds)+":"+values);
+   	   	 		}
+
+   	   	 		// Sum parent kpi //
+   	 			if(elParent.is(':checked')){   	   	 			
    	 				sumValue = sumValue + parseFloat(values);
+
    	 			}else{
-   	 				$(this).children("td:nth-child(7)").children('input[type="number"]').val(0.00);
+   	 				elParent.parent().parent().children("td:nth-child(7)").children('input[type="number"]').val(0.00);
+   	 			}
+
+   	 			// ในกรณีที่มี kpi ย่อยให้ืำการตรวจสอบการกำหนดค่าของ weight ของ kpi นั้น ๆ ก่อน //
+   	 			if(elChild.is(':checked')){   	 				
+   	 				// find uniqe parent kpi //
+   	 				var classNameArr = elChild.attr("class").split(" ");;
+   	 				if(jQuery.inArray(classNameArr[0], childClassArr) == -1){
+   	 					childClassArr.push(classNameArr[0]);
+   	 				}
+   	 				console.log("childClassArr:"+childClassArr);
    	 			}
    	 		});
-   	 		//console.log("currentWeightValArr: "+currentWeightValArr);
 
+   	 		// ตรวจสอบ parent kpi ว่ามีข้อมูล wight ครอบ 100 แล้วหรือไม่ //
+   	 		// Null คือ usre ไม่ได้เลอก kpi ไดเลยจึงสามารถให้ดำเนินงานต่อได้ //
    	 		if(sumValue == null || sumValue == 100){
-   	 			insertResult(currentWeightValArr);
+   	 			var sumChildValue = null;
+   	 			var insertFlag = false;
+
+   	 			// ตรวจอสอบค่าถ่วงน้ำหนักของ child kpi โดยแบ่งกลุ่มตาม parent kpi ต้องเท่ากับ 100 //
+   	 			$.each(childClassArr, function(key, value){
+					var elParentClass = "parent"+value.substring(value.search("-"));   	 				
+   	 				var kpiParentName = $('input[type="checkbox"].'+elParentClass).parent().parent().children("td:nth-child(3)").html();
+   	 				sumChildValue = null; 
+   	 				// get value by element class //
+   	 				$('input[type="checkbox"].'+value).each(function(){
+   	 					var childValue = 
+   	 						$(this).parent().parent().children("td:nth-child(7)").children('input[type="number"]').val();
+   	 					var childKpiId= $(this).parent().parent().children("td:nth-child(1)").html();
+   	 					sumChildValue = sumChildValue+parseFloat(childValue);
+   	 				});
+
+   	 				if(sumChildValue == null || sumChildValue == 100){
+   	 					insertFlag = true;
+   	 				}else{
+   	 					insertFlag = false;
+   	 					$.confirm({
+					   	     text: 'ค่าถ่วงน้ำหนักตัวบ่งชี้ย่อย ของตัวบ่งชี้ <br/>"'
+					   	     	+kpiParentName+'" <br/>รวมกันต้องเท่ากับ 100',
+					   	     title: "บันทึก กำหนดตัวบ่งชี้",
+					   	     confirm: function(button) {		 
+					   	     	// nothing to do
+					   	     },
+					   	     cancel: function(button) {
+					   	         // nothing to do
+					   	     },
+					   	     confirmButton: "ตกลง",
+					   	     cancelButton: "ยกเลืก",
+					   	     post: true,
+					   	     confirmButtonClass: "btn-primary",
+					   	     cancelButtonClass: "btn-danger",
+					   	     dialogClass: "modal-dialog modal-lg" // Bootstrap classes for large modal
+						});
+			   	 		$(".btn-danger").hide();
+   	 				}
+   	 			});
+   	 			if(childClassArr.length == 0){ insertFlag = true;}
+   	 			if(insertFlag === true){insertResult(currentWeightValArr);}
+
    	 		}else{
 	   	 		$.confirm({
 			   	     text: "ค่าถ่วงน้ำหนักรวมกันต้องเท่ากับ 100",
@@ -332,6 +396,7 @@
 	   	 		$(".btn-danger").hide();
    	 		}
    	 	}
+
 
    	 	function insertResult(currentWeightValArr){
    	 		var currentValArr = [];
@@ -514,6 +579,7 @@
 		background-color: transparent;
 	}  
 	.center {text-align: center;}
+	input[type="checkbox"].child{ margin-left: 50px; }
 </style>
 </head>
 
@@ -607,14 +673,30 @@
 							<tr id="r${kpi.kpiId}">
 								<td style="display: none;">${kpi.kpiId}</td>
 								<td style="text-align: center">
-									<c:choose>
-										<c:when test="${kpi.resultId>0}">
-											<input type="checkbox" name="isUsed" value="1" checked>
-										</c:when>
-										<c:otherwise>
-											<input type="checkbox" name="isUsed" value="1">
-										</c:otherwise>
-									</c:choose>
+								<c:choose>
+									<c:when test="${empty kpi.parentKpiId}">
+										<c:choose>
+											<c:when test="${kpi.resultId>0}">
+												<input type="checkbox" name="isUsed" class="parent-${kpi.kpiId} parent" value="1" checked>
+											</c:when>
+											<c:otherwise>
+												<input type="checkbox" name="isUsed" class="parent-${kpi.kpiId} parent" value="1">
+											</c:otherwise>
+										</c:choose>
+									</c:when>
+									<c:otherwise>
+										<c:choose>
+											<c:when test="${kpi.resultId>0}">
+												<input type="checkbox" name="isUsed" class="child-${kpi.parentKpiId} child" value="1" checked>
+											</c:when>
+											<c:otherwise>
+												<input type="checkbox" name="isUsed" class="child-${kpi.parentKpiId} child" value="1">
+											</c:otherwise>
+										</c:choose>
+									</c:otherwise>
+								</c:choose>
+
+									
 								</td>
 								<td>${chandraFn:nl2br(kpi.kpiName)}</td>
 								<td class="center">${chandraFn:nl2br(kpi.calendarTypeName)}</td>
