@@ -45,7 +45,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 
-import th.ac.chandra.eduqa.domain.Kpi;
 import th.ac.chandra.eduqa.form.AssignResultQualityForm;
 import th.ac.chandra.eduqa.form.AssignResultQuantityForm;
 import th.ac.chandra.eduqa.form.EvidenceQualityForm;
@@ -57,7 +56,6 @@ import th.ac.chandra.eduqa.form.ResultQualityForm;
 import th.ac.chandra.eduqa.form.ResultQualityTable;
 import th.ac.chandra.eduqa.form.ResultQuantityForm;
 import th.ac.chandra.eduqa.form.ResultQuantityTable;
-import th.ac.chandra.eduqa.mapper.CustomObjectMapper;
 import th.ac.chandra.eduqa.mapper.ResultService;
 import th.ac.chandra.eduqa.model.CdsEvidenceModel;
 import th.ac.chandra.eduqa.model.CdsModel;
@@ -85,13 +83,11 @@ public class ResultController {
 	@Autowired
 	@Qualifier("eduqaServiceWSImpl")
 	private EduqaService service;
-	//private String uploadDirectory = "/home/portal/super-kpi/file-upload";
-	private String uploadDirectory = "/home/gj-app-dev/kmutt/super-kpi/file-upload";
+	private String uploadDirectory = "/home/portal/super-kpi/file-upload";
+	//private String uploadDirectory = "/home/gj-app-dev/kmutt/super-kpi/file-upload";
+	//private String uploadDirectory = "/home/ittishat/app/super-kpi/file-upload";
 	private String directoryDelimitor;
-	
-	@Autowired
-	private CustomObjectMapper customObjectMapper;
-	
+
 	private Integer tempGroupOptValue = 0;
 
 	@InitBinder
@@ -368,7 +364,14 @@ public class ResultController {
 		calendarTypes.setDescCode(kpiDetail.getCalendarTypeId().toString());
 		List<DescriptionModel> calendarTypeLists = service.getCalendarTypeById(calendarTypes);
 		resultForm.setYearName(calendarTypeLists.get(0).getDescription());
-		resultForm.setYearNo(kpiDetail.getAcademicYear().toString());
+		//resultForm.setYearNo(kpiDetail.getAcademicYear().toString());
+		if(kpiDetail.getCalendarTypeId() == 1){
+			resultForm.setYearNo(kpiResult.getCalendarYear().toString());
+		}else if(kpiDetail.getCalendarTypeId() == 2){
+			resultForm.setYearNo(kpiResult.getAcademicYear().toString());
+		}else{
+			resultForm.setYearNo(kpiResult.getFiscalYear().toString());
+		}
 		
 		SysMonthModel monthM = new SysMonthModel();
 		monthM.setMonthId(monthId);

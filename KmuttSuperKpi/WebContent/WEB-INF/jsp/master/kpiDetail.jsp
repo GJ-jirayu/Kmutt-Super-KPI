@@ -112,6 +112,8 @@
 	       	getCriteraiMethod();
 	     	getSuperKpi(); 
 
+	     	
+
 	    });
 
 	    function pageMessage(){
@@ -631,6 +633,28 @@
 	    }
 	    // result criteria tabs
 	     function showCriteriaGroup(current,elName,editMode){
+	    	// ตรวจสอบกานเพิ่ม tabs แบ่งกลุ่ม เพราะว่าการเพิ่มคะแนนจำเป็นต้องทการแบ่งกลุ่มเสียก่อน //
+		     	if(elName == "actRangeDetail"){
+		     		var groupChildTab = $("#rangeBaselineTab").children("div");
+		     		if(groupChildTab.length == 0){
+		     			$.confirm({
+							title: "เกณฑ์แปลงคะแนน / เพิ่มคะแนน",
+						    text: "<font size='3' color='#FF0000'> กรุณาทำการเพิ่มกลุ่มก่อนการเพิ่มคะแนน !! </font>",						    
+						    confirm: function(button) { 
+						    	showCriteriaGroup(current,'actRangeGroup',0) 
+						    },
+							cancel: function(button) { /*// Not thing to do and hidden//*/ },
+							confirmButton: "ตกลง",
+							cancelButton: "ยกเลิก",
+							post: true,
+							confirmButtonClass: "btn-primary",
+							cancelButtonClass: "btn-danger",
+							dialogClass: "modal-dialog modal-lg" // Bootstrap classes for large modal
+						});
+						$(".btn-danger").hide()
+		     		}
+		     	}
+	    	
 	    	//hide , show
 	    	var cnt = $(current).closest('.tabAction');
 		    var target = cnt.children("div#"+elName);
@@ -721,8 +745,12 @@
     		{
         		$('input#radioCriteriaScore1').attr('checked', true);
         		$('#radioCriteriaScore2').prop("disabled",true);
+        		//$(".kpi-formula").accordion( "enabled" )
     		}else{
     			$('#radioCriteriaScore2').prop("disabled",false);
+
+    			// ถ้าเป็นเชิงคุณภาพให้ซ่อนสูตรการคำนวณ //
+	     		//$(".kpi-formula").accordion("option", "disabled", true);
     		}
 
     		getCriteraiMethod();
@@ -810,8 +838,7 @@
     	function deleteQuan(current){
     		var cnt = $(current).closest("table");
     		var baselineId = cnt.find("tr:nth-child(1)").find("td:nth-child(2)").html();
-    		var baselineName = "test";
-    		if(confirm('ยินยันการลบ "'+baselineName+'"')){
+    		if(confirm('ยินยันการลบ')){
 	    		$.ajax({
 	    			dataType:'json',
 	    			url: "<%=doDeleteBaseline%>" ,
@@ -1812,7 +1839,8 @@
 					</div>
 				</div> <!-- end tabContentTemplate -->
 			</div>
-			<h3>สูตรการคำนวน</h3>
+			<!-- kpi-formula ui-accordion-header ui-helper-reset ui-state-default ui-accordion-icons ui-corner-all -->
+			<h3 class="">สูตรการคำนวน</h3>
 			<div class="kpi-formula">
 				<form:form  id="kpiFormFormula" modelAttribute="kpiForm" method="post"  name="kpiForm" action="${formActionNew}" enctype="multipart/form-data">
 				<div class="formula-desc">

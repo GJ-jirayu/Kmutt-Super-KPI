@@ -361,6 +361,7 @@ public class EduqaServiceJpaImpl  implements EduqaService {
 	//########## kpi section
 	@Override
 	public Integer saveKpi(Kpi persistentInstance) throws DataAccessException {
+		persistentInstance.setParentId(persistentInstance.getParentId() == 0 ? null : persistentInstance.getParentId());
 		return repository.saveKpi(persistentInstance);
 	}
 
@@ -934,6 +935,9 @@ public class EduqaServiceJpaImpl  implements EduqaService {
 	}
 	public List previewOracleQueryResult(DbQueryModel q) { 
 		return repository.previewOracleQueryResult(q);
+	}
+	public List previewDb2QueryResult(DbQueryModel q){
+		return repository.previewDb2QueryResult(q);
 	}
 	// ========================= START description ===================
 	@Override

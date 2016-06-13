@@ -203,7 +203,8 @@ public class KpiController {
 		for(DescriptionModel parent: parents){
 			parentList.put(parent.getDescCode(),parent.getDescription());
 		}
-		model.addAttribute("parentList", parentList);
+		Map<String, String> parentListSortedMap = new TreeMap<String, String>(parentList);
+		model.addAttribute("parentList", parentListSortedMap);
 		
 		Map<String,String> criteriaTypeList = new HashMap<String,String>();
 		List<DescriptionModel> crTypes = service.getCriTypes(new DescriptionModel());

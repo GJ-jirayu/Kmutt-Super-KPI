@@ -199,6 +199,7 @@ public class CdsController {
 		Map<String,String> dbTypeList = new HashMap<String,String>();
 		dbTypeList.put("mysql","mysql");
 		dbTypeList.put("oracle","oracle");
+		dbTypeList.put("db2","db2");
 		model.addAttribute("dbTypeList", dbTypeList);
 		// conn
 		DbConnModel connModel = new DbConnModel();

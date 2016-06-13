@@ -607,13 +607,13 @@
 					<form:options items="${levelList}" />
 				</form:select>
 
-				<span>เป้าประสงค์: </span>
-				<form:select id="groupId" path="groupId" class="input-xlarge wid">
+				<span style="display: none;">เป้าประสงค์: </span>
+				<form:select id="groupId" path="groupId" class="input-xlarge wid" style="display: none;">
 					<form:options items="${groupLists}" />
 				</form:select>
 
-				<span>มุมมอง: </span>
-				<form:select id="perspectiveId" path="perspectiveId" class="input-large wid">
+				<span style="display: none;">มุมมอง: </span>
+				<form:select id="perspectiveId" path="perspectiveId" class="input-large wid" style="display: none;">
 					<form:options items="${perLists}" />
 				</form:select>
 				<br/>

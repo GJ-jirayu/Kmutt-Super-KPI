@@ -736,6 +736,8 @@ public class AssignKpiController {
 				KpiResultModel resultModel = new KpiResultModel();
 				resultModel.setOrgId(orgM.getOrgId());
 				resultModel.setKpiLevelId(orgM.getLevelId());
+				resultModel.setKpiPerspectiveId(0);
+				resultModel.setKpiGroupId(0);
 				@SuppressWarnings("unchecked")
 				List<KpiResultModel> resultKpis = service.searchKpiResultWithActiveKpi(resultModel);
 				for( KpiResultModel result : resultKpis){

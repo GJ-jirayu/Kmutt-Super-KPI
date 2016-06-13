@@ -1341,6 +1341,69 @@ public class EduqaRepository   {
 		transList.add(records);
 		return transList;
 	}
+	public List previewDb2QueryResult(DbQueryModel q){
+		/*maxColumnNo is deprecated*/
+		ArrayList transList = new ArrayList();
+		ArrayList records = new ArrayList();
+		String status  = "";
+		try {
+			Class.forName("com.ibm.db2.jcc.DB2Driver").newInstance();
+			Connection conn = null;
+	  		Statement stmt = null;
+	  		try { 
+	  		     // conn =   DriverManager.getConnection("jdbc:db2://sysmvs1.stl.ibm.com:5021/STLEC1:user=dbadm;password=dbadm;");
+	  		    String url = "jdbc:db2://"+q.getConn().getHostName()+":"+q.getConn().getPort()+"/"+q.getConn().getDbName();
+	  		    System.out.println("\n --url--> "+url+"\n");
+	  		    conn = DriverManager.getConnection(url,q.getConn().getUsername(),q.getConn().getPassword());
+	  			
+	  			System.out.println("\n --url--> "+url+"\n");
+	  			
+	  			try{
+	  				  stmt = conn.createStatement();
+	  				  stmt.setMaxRows(q.getMaxRow());
+	  			      ResultSet rs = stmt.executeQuery(q.getQuery());
+	  			      //get Meta
+		  		      ResultSetMetaData metaData = rs.getMetaData();
+				  		  int countColumn = metaData.getColumnCount(); //number of column
+	  			    	  List<String> headCol = new ArrayList();
+	  			    	  for(Integer i = 1;i<=countColumn;i++){
+	  			    		headCol.add( metaData.getColumnLabel(i)  );
+	  			    	  }
+	  			    	  records.add(headCol);
+	  			      //get DataSet
+	  			      while(rs.next()){
+	  			    	  //ArrayList record = new ArrayList();
+	  			    	  List<String> cols = new ArrayList();
+	  			    	  for(Integer i=1;i<=countColumn;i++){
+	  			    		  cols.add( rs.getString(i) );
+	  			    	  }
+	  			    	  records.add(cols);
+	  			      }
+	  			      rs.close();
+		  		      stmt.close();
+		  		      conn.close();
+	  			  }catch(SQLException ex){
+	  				   status = ex.getMessage();
+	  			  }catch(Exception ex){
+	  				   status = ex.getMessage();
+	  			  }
+	  		} catch (SQLException ex) {
+	  			status = "connection refused";
+	  		     // System.out.println("SQLException: " + ex.getMessage());
+	  		     // System.out.println("SQLState: " + ex.getSQLState());
+	  		     // System.out.println("VendorError: " + ex.getErrorCode());
+	  		}
+		} catch (Exception ex) {
+			status = ex.getMessage();
+			ex.printStackTrace();
+		}
+		  
+		transList.add(status);
+		transList.add(records);
+		return transList;
+	}	
+	
+	
 	// ######## kpi criteria ########/
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List searchCriteriaGroup(Paging pagging, String keySearch){
@@ -1973,7 +2036,6 @@ public class EduqaRepository   {
 			BeanUtils.copyProperties(resultD1, result);
 			result.setResultId(null);
 			Double monthValue = monthList.get(monthNum);
-			result.setTargetValue(monthValue);
 			
 			//find monthId from calendarMonth//
 			String sql = "select p from SysMonth p "
@@ -1985,45 +2047,20 @@ public class EduqaRepository   {
 			result.setMonthID(sysMonth.getMonthId());
 			
 			String qCheck = "select "
-					+ "result_id, " 
-					+ "kpi_perspective_id, " 
-					+ "kpi_perspective_name, "
-					+ "kpi_weight, "
-					+ "calendar_year, "
-					+ "fiscal_year, "
-					+ "academic_month_no, "
-					+ "calendar_month_no, "
-					+ "fiscal_month_no, "
-					+ "kpi_code, "
-					+ "parent_kpi_id, "
-					+ "has_child, "
-					+ "formula_desc, "
-					+ "multiplicand, "
-					+ "denominator, "
-					+ "th_month_name" 
-					+ "from kpi_result where org_id = "+result.getOrgId()+" and kpi_id = "+result.getKpiId()+" and month_id = "+result.getMonthID();
+					+ "result_id,"
+					+ "kpi_id " 
+					+ "from kpi_result where org_id = "+result.getOrgId()+" "
+					+ "and kpi_id = "+result.getKpiId()+" "
+					+ "and month_id = "+result.getMonthID();
 			Query queryCheck = entityManager.createNativeQuery(qCheck);
 			List<Object[]> resultCheck = queryCheck.getResultList();			
 			if(resultCheck.size() > 0){
 				Object[] resultRow = resultCheck.get(0);
-				result.setResultId((Integer) resultRow[0]);
-				result.setKpiPerspectiveId((Integer) resultRow[1]);
-				result.setKpiPerspectiveName((String) resultRow[2]);
-				result.setKpiWeight(Double.parseDouble(resultRow[3].toString()));
-				result.setCalendarYear((Integer) resultRow[4]);
-				result.setFiscalYear((Integer) resultRow[5]);
-				result.setAcademicMonthNo((Integer) resultRow[6]);
-				result.setCalendarMonthNo((Integer) resultRow[7]);
-				result.setFiscalMonthNo((Integer) resultRow[8]);
-				result.setKpiCode((String) resultRow[9]);
-				result.setParentKpiId((Integer) resultRow[10]);
-				result.setHasChild(resultRow[11]==null ? "0" : resultRow[11].toString());	
-				result.setFormulaDesc((String) resultRow[12]);	
-				result.setMultiplicand((String) resultRow[13]);	
-				result.setDenominator((String) resultRow[14]);
-				result.setThMonthName((String) resultRow[15]);
-				result.setActive(1);
-				entityManager.merge(result);
+				KpiResult setKpiResult = entityManager.find(KpiResult.class, (Integer) resultRow[0]);
+				setKpiResult.setTargetValue(monthValue);
+				setKpiResult.setActive(1);
+				
+				entityManager.merge(setKpiResult);
 				size++;
 			}
 		}

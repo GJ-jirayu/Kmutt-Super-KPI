@@ -100,6 +100,7 @@ public interface EduqaService {
 	public boolean checkConnection(DbConnModel conn);
 	public List previewMysqlQueryResult(DbQueryModel q);
 	public List previewOracleQueryResult(DbQueryModel q);
+	public List previewDb2QueryResult(DbQueryModel q);
 	
 	//cds
 	public Cds findCdsById(Integer CdsId)throws DataAccessException  ;

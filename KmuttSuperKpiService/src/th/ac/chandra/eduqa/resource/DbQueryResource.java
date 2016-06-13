@@ -71,6 +71,9 @@ public class DbQueryResource extends BaseResource {
 								else if(conn.getDbType().equals("oracle")){
 									result = service.previewOracleQueryResult(xsource);
 								}
+								else if(conn.getDbType().equals("db2")){
+									result = service.previewDb2QueryResult(xsource);
+								}
 								msg.setMsgDesc((String) result.get(0));
 								if( ((ArrayList) result.get(1)).size() != 0 ){
 									imakeMessage.setResultListObj( (List)result.get(1) );

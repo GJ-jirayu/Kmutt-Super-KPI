@@ -12,20 +12,18 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.Dom4JDriver;
+
 import th.ac.chandra.eduqa.xstream.common.ImakeResultMessage;
 import th.ac.chandra.eduqa.xstream.common.ImakeXML;
 import th.ac.chandra.eduqa.xstream.common.Paging;
 
-import com.liferay.portal.kernel.util.PropsUtil;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.Dom4JDriver;
-
 public class PostCommon {
 	public static final int PAGE_SIZE = 5; 
 	public ImakeResultMessage  postMessage(ImakeXML vserviceXML,String className,String endPoint,boolean isReturn) {
-	   // HttpPost httppost = new HttpPost(ServiceConstant.hostReference+endPoint); 
-		//HttpPost httppost = new HttpPost("http://10.1.127.61:8081/KmuttSuperKpiService/rest/"+endPoint);
-		HttpPost httppost = new HttpPost("http://localhost:8081/KmuttSuperKpiService/rest/"+endPoint);
+		HttpPost httppost = new HttpPost("http://10.1.127.61:8081/KmuttSuperKpiService/rest/"+endPoint);
+		//HttpPost httppost = new HttpPost("http://localhost:8081/KmuttSuperKpiService/rest/"+endPoint);
 	   XStream xstream = new XStream(new Dom4JDriver());
 		Class c  = null;
 		try {
@@ -64,7 +62,7 @@ public class PostCommon {
 			e1.printStackTrace();
 		}
 		httppost.setEntity(entity); 
-		HttpClient httpclient = new DefaultHttpClient(); 
+		HttpClient httpclient = new DefaultHttpClient();
 		HttpResponse response = null;
 		HttpEntity resEntity = null;
 		try {
