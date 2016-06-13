@@ -260,7 +260,6 @@
 					$(indexEntry).css({"border-color": "", "box-shadow": ""}); 				}
 				
 			});
-
 			if(elCount == 0){ doSubmitDetail(); }else{ alert("กรุณากรอกข้อมูลให้ครบถ้วน!!");}
 		}
 
@@ -317,6 +316,9 @@
     	}
 
     	function doSubmit(){
+    		$("#tempFormula").val($("#formula").val());
+    		$("#tempFormulaDesc").val($("#formulaDesc").val());
+    		
     		if($('#kpiDetail #kpiId').val()==""){
 	    		$('#kpiDetail #kpiFormDetail').attr("action","<%=formActionInsert%>");
 	    	}else{
@@ -1561,11 +1563,22 @@
 										</option>
 									</c:when>
 									<c:otherwise>
-										<option
-											value="${parent.key}" 
-											title="${fn:substring(parent.value, fn:indexOf(parent.value, ":")+1, fn:length(parent.value))}"> 
-											${fn:substring(parent.value, 0, fn:indexOf(parent.value, ":"))}
-										</option>
+										<c:choose>
+											<c:when test="${parent.key eq 0}">
+												<option selected="true"
+													value="${parent.key}" 
+													title="${fn:substring(parent.value, fn:indexOf(parent.value, ":")+1, fn:length(parent.value))}"> 
+													${fn:substring(parent.value, 0, fn:indexOf(parent.value, ":"))}
+												</option>
+											</c:when>
+											<c:otherwise>
+												<option
+													value="${parent.key}" 
+													title="${fn:substring(parent.value, fn:indexOf(parent.value, ":")+1, fn:length(parent.value))}"> 
+													${fn:substring(parent.value, 0, fn:indexOf(parent.value, ":"))}
+												</option>
+											</c:otherwise>
+										</c:choose>									
 									</c:otherwise>
 								</c:choose> 
 							</c:forEach>
@@ -1615,6 +1628,8 @@
 				<input type="button" class="cancel" onClick="doBack2List()" value="ยกเลิก" /> 
 				<input type="button" class="btn btn-success" onClick="actAdd()" value="เพิ่มตัวบ่งชี้ใหม่" /> 
 			</div>
+			<form:input id="tempFormula" type="hidden" path="kpiModel.formula" />
+			<form:input id="tempFormulaDesc" type="hidden" path="kpiModel.formulaDesc" />
 			</form:form>			
 		</div> <!--  end detail box -->
 

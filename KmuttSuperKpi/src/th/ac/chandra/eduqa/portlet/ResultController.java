@@ -112,8 +112,12 @@ public class ResultController {
 		String UserOrgId = "1";
 		Integer monthId = 0;
 		Integer groupId = 0;
+		Integer yearNo = 0;
 		//  initial param
 		SysYearModel sy = service.getSysYear();
+		if(request.getParameter("filterYear")!=null){
+			yearNo =  Integer.parseInt(request.getParameter("filterYear"));
+		}
 		if(request.getParameter("month")!=null){
 			monthId =  Integer.parseInt(request.getParameter("month"));
 		}
@@ -202,10 +206,10 @@ public class ResultController {
 		KpiResultModel kpiResultModel = new KpiResultModel();
 		kpiResultModel.setOrgId(org.getOrgId());
 		kpiResultModel.setMonthID(monthId);
-		kpiResultModel.setAcademicYear( CurrentCalendar.getAcademicYear());
-		kpiResultModel.setFiscalYear( CurrentCalendar.getAcademicYear());
-		kpiResultModel.setCalendarYear( CurrentCalendar.getAcademicYear());
-		kpiResultModel.setThMonthName( CurrentCalendar.getThMonthName());
+		kpiResultModel.setAcademicYear(yearNo);
+		kpiResultModel.setFiscalYear(yearNo);
+		kpiResultModel.setCalendarYear(yearNo);
+		kpiResultModel.setThMonthName(CurrentCalendar.getThMonthName());
 		kpiResultModel.setKpiGroupId(groupId);
 		Paging page = new Paging();
 		page.setPageNo(1);
@@ -690,6 +694,7 @@ public class ResultController {
 		response.setRenderParameter("orgId", orgId);
 		response.setRenderParameter("month", String.valueOf(dm.getMonthId()));
 		response.setRenderParameter("group", String.valueOf(form.getGroupId()));
+		response.setRenderParameter("filterYear", form.getCalendarYear().toString());
 	}
 	
 	// ########################### quality คุณภาพ ###################

@@ -1923,6 +1923,7 @@ public class EduqaRepository   {
 		StringBuffer sb = new StringBuffer("");
 		sb.append("where  p.calendarYear ="+persistentInstance.getCalendarYear()+" "
 					+ "and p.calendarMonthNo = "+persistentInstance.getCalendarMonthNo()+" ");
+		
 		ArrayList transList = new ArrayList();
 		Query query = entityManager.createQuery("select p from SysMonth p "
 				+ sb.toString(), SysMonth.class);
@@ -2131,7 +2132,6 @@ public class EduqaRepository   {
 		model.setListMonth(targets);
 		return model;
 	}
-
 	
 	// =====[ END: TARGET ]================================================================================//
 
@@ -2208,6 +2208,7 @@ public class EduqaRepository   {
 					+ " from  kpi_result kr  "
 					+ " where org_id = "+domain.getOrgId()
 					+ groupCondi
+					+ " and active =1 "
 					+ " and ((academic_year = "+domain.getAcademicYear()+" and th_month_name = '"+domain.getThMonthName()+"')"
 					+ "or (fiscal_year = "+domain.getFiscalYear()+" and th_month_name = '"+domain.getThMonthName()+"')"
 					+ "or (calendar_year = "+domain.getCalendarYear()+" and th_month_name = '"+domain.getThMonthName()+"'))"

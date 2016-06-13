@@ -361,7 +361,7 @@ public class EduqaServiceJpaImpl  implements EduqaService {
 	//########## kpi section
 	@Override
 	public Integer saveKpi(Kpi persistentInstance) throws DataAccessException {
-		persistentInstance.setParentId(persistentInstance.getParentId() == 0 ? null : persistentInstance.getParentId());
+		/*persistentInstance.setParentId(persistentInstance.getParentId() == 0 ? null : persistentInstance.getParentId());*/
 		return repository.saveKpi(persistentInstance);
 	}
 

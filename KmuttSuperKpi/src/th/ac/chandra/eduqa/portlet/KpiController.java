@@ -204,7 +204,7 @@ public class KpiController {
 			parentList.put(parent.getDescCode(),parent.getDescription());
 		}
 		Map<String, String> parentListSortedMap = new TreeMap<String, String>(parentList);
-		model.addAttribute("parentList", parentListSortedMap);
+		model.addAttribute("parentList", sortHashMapByValues(parentListSortedMap));
 		
 		Map<String,String> criteriaTypeList = new HashMap<String,String>();
 		List<DescriptionModel> crTypes = service.getCriTypes(new DescriptionModel());
@@ -344,7 +344,7 @@ public class KpiController {
 			kpi.setPassFlag(null);
 			kpi.setScoreFlag(null);
 		}
-		
+		kpi.setParentId(kpi.getParentId() == 0 ? null : kpi.getParentId());
 		kpi.setAcademicYear(getCurrentYear());
 		kpi.setCreatedBy(user.getFullName());
 		kpi.setUpdatedBy(user.getFullName());
@@ -382,6 +382,7 @@ public class KpiController {
 			kpi.setPassFlag(null);
 			kpi.setScoreFlag(null);
 		}
+		kpi.setParentId(kpi.getParentId() == 0 ? null : kpi.getParentId());
 		kpi.setAcademicYear(getCurrentYear());
 		kpi.setUpdatedBy(user.getFullName());
 		service.updateKpi(kpi);
@@ -1074,5 +1075,35 @@ public class KpiController {
 		}else{
 			return "";
 		}
+	}
+	
+	private LinkedHashMap<String, String> sortHashMapByValues(
+	        Map<String, String> parentListSortedMap) {
+	    List<String> mapKeys = new ArrayList<>(parentListSortedMap.keySet());
+	    List<String> mapValues = new ArrayList<>(parentListSortedMap.values());
+	    Collections.sort(mapValues);
+	    Collections.sort(mapKeys);
+
+	    LinkedHashMap<String, String> sortedMap =
+	        new LinkedHashMap<>();
+
+	    Iterator<String> valueIt = mapValues.iterator();
+	    while (valueIt.hasNext()) {
+	        String val = valueIt.next();
+	        Iterator<String> keyIt = mapKeys.iterator();
+
+	        while (keyIt.hasNext()) {
+	        	String key = keyIt.next();
+	            String comp1 = parentListSortedMap.get(key);
+	            String comp2 = val;
+
+	            if (comp1.equals(comp2)) {
+	                keyIt.remove();
+	                sortedMap.put(key, val);
+	                break;
+	            }
+	        }
+	    }
+	    return sortedMap;
 	}
 }

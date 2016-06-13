@@ -242,18 +242,54 @@
  					<span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span>
  				</div>
  				<div id="eachMonth0">
- 					<div><span>มกราคม</span><form:input type="text" maxlength="15" id="m1" path="rmonth1" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span></div>
- 					<div><span>กุมภาพันธ์</span><form:input type="text" maxlength="15" id="m2" path="rmonth2" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span></div>
- 					<div><span>มีนาคม</span><form:input type="text" maxlength="15" id="m3" path="rmonth3" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span></div>
- 					<div><span>เมษายน</span><form:input type="text" maxlength="15" id="m4" path="rmonth4" class="numbersOnly" style="margin-left:-35%;"/><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span></div>
- 					<div><span>พฤษภาคม</span><form:input type="text" maxlength="15" id="m5" path="rmonth5" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span></div>
- 					<div><span>มิถุนายน</span><form:input type="text" maxlength="15" id="m6" path="rmonth6" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span></div>
- 					<div><span>กรกฎาคม</span><form:input type="text" maxlength="15" id="m7" path="rmonth7" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span></div>
- 					<div><span>สิงหาคม</span><form:input type="text" maxlength="15" id="m8" path="rmonth8" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span></div>
- 					<div><span>กันยายน</span><form:input type="text" maxlength="15" id="m9" path="rmonth9" class="numbersOnly" style="margin-left:-35%;"/><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span></div>
- 					<div><span>ตุลาคม</span><form:input type="text" maxlength="15" id="m10" path="rmonth10" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span></div>
- 					<div><span>พฤศจิกายน</span><form:input type="text" maxlength="15" id="m11" path="rmonth11" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span></div>
- 					<div><span>ธันวาคม</span><form:input type="text" maxlength="15" id="m12" path="rmonth12" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span></div>
+ 					<div>
+ 						<span>มกราคม</span>
+ 						<form:input type="text" maxlength="15" id="m1" path="rmonth1" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span>
+ 					</div>
+ 					<div>
+ 						<span>กุมภาพันธ์</span>
+ 						<form:input type="text" maxlength="15" id="m2" path="rmonth2" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span>
+ 					</div>
+ 					<div>
+ 						<span>มีนาคม</span>
+ 						<form:input type="text" maxlength="15" id="m3" path="rmonth3" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span>
+ 					</div>
+ 					<div>
+ 						<span>เมษายน</span>
+ 						<form:input type="text" maxlength="15" id="m4" path="rmonth4" class="numbersOnly" style="margin-left:-35%;"/><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span>
+ 					</div>
+ 					<div>
+ 						<span>พฤษภาคม</span>
+ 						<form:input type="text" maxlength="15" id="m5" path="rmonth5" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span>
+ 					</div>
+ 					<div>
+ 						<span>มิถุนายน</span>
+ 						<form:input type="text" maxlength="15" id="m6" path="rmonth6" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span>
+ 					</div>
+ 					<div>
+ 						<span>กรกฎาคม</span>
+ 						<form:input type="text" maxlength="15" id="m7" path="rmonth7" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span>
+ 					</div>
+ 					<div>
+ 						<span>สิงหาคม</span>
+ 						<form:input type="text" maxlength="15" id="m8" path="rmonth8" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span>
+ 					</div>
+ 					<div>
+ 						<span>กันยายน</span>
+ 						<form:input type="text" maxlength="15" id="m9" path="rmonth9" class="numbersOnly" style="margin-left:-35%;"/><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span>
+ 					</div>
+ 					<div>
+ 						<span>ตุลาคม</span>
+ 						<form:input type="text" maxlength="15" id="m10" path="rmonth10" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span>
+ 					</div>
+ 					<div>
+ 						<span>พฤศจิกายน</span>
+ 						<form:input type="text" maxlength="15" id="m11" path="rmonth11" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span>
+ 					</div>
+ 					<div>
+ 						<span>ธันวาคม</span>
+ 						<form:input type="text" maxlength="15" id="m12" path="rmonth12" class="numbersOnly" style="margin-left:-35%;" /><span class="error" style="color: Red; display: none;font-size:0.8em; position: absolute;">* Input digits (0 - 9)</span>
+ 					</div>
  				</div>
  				<div style="clear:both;"></div>
  				<div id="eachMonth">
