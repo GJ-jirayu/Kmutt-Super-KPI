@@ -43,7 +43,7 @@
     		if(!${not empty pageMessage}){
     			$('#pageMessage').css("display","none");
     		}
-    		/*$("#assignKpi_accordion").accordion({
+    		/*$("#assignKpi").accordion({
     			 heightStyle: "content",
     			 collapsible: true
     		});*/
@@ -299,7 +299,7 @@
    	 		var currentWeightValArr = [];
    	 		var childClassArr = [];
    	 		var sumValue = null;
-   	 		$("#assignKpi_accordion table.tableGridLv>tbody>tr").each(function(){
+   	 		$("#assignKpi table.tableGridLv>tbody>tr").each(function(){
    	 			var elNormal = $(this).children("td:nth-child(2)").children('input[type="checkbox"]');
    	 			var elParent = $(this).children("td:nth-child(2)").children('input[type="checkbox"].parent');
    	 			var elChild = $(this).children("td:nth-child(2)").children('input[type="checkbox"].child');
@@ -400,7 +400,7 @@
 
    	 	function insertResult(currentWeightValArr){
    	 		var currentValArr = [];
-   	 		$("#assignKpi_accordion table.tableGridLv>tbody>tr").each(function(){
+   	 		$("#assignKpi table.tableGridLv>tbody>tr").each(function(){
    	 			if($(this).children("td:nth-child(2)").children('input[type="checkbox"]').is(':checked')){
    	   	 			currentValArr.push($(this).children("td:nth-child(1)").html());	
    	 			}
@@ -464,12 +464,12 @@
 					success : function(data) {
 						if (data['header']['success'] > 0) {
 							$(
-									'#assignKpi_accordion table tbody tr input[type="checkbox"]')
+									'#assignKpi table tbody tr input[type="checkbox"]')
 									.prop('checked', false);
 							var kpiIds = data['content']['lists'].split('-');
 							for (var i = 0; i < kpiIds.length; i++) {
 								$(
-										'#assignKpi_accordion table tbody tr#r'
+										'#assignKpi table tbody tr#r'
 												+ kpiIds[i]).children(
 										'td:nth-child(2)').children(
 										'input[type="checkbox"]').prop(
@@ -492,7 +492,7 @@
 	}
 
 	function toggleSetTargetBtn() {
-		$('#assignKpi_accordion table tbody tr').each(
+		$('#assignKpi table tbody tr').each(
 				function() {
 					if ($(this).children('td:nth-child(2)').children(
 							'input[type="checkbox"]').is(':checked')) {
@@ -505,7 +505,7 @@
 
 	function KpiResultDefalutValueTemp(){
 		var arId = [];
-   	 	$("#assignKpi_accordion table.tableGridLv>tbody>tr").each(function(){
+   	 	$("#assignKpi table.tableGridLv>tbody>tr").each(function(){
    	 		if($(this).children("td:nth-child(2)").children('input[type="checkbox"]').is(':checked')){
    	   			arId.push($(this).children("td:nth-child(1)").html());	
    	 		}
@@ -543,38 +543,38 @@
 </script>
 <style type="text/css">
 	/* (1)+5 td*/
-	#assignKpi_accordion table.tableGridLv td:nth-child(1) {
+	#assignKpi table.tableGridLv td:nth-child(1) {
 		display: none
 	}
 
-	#assignKpi_accordion table.tableGridLv td:nth-child(2) {
+	#assignKpi table.tableGridLv td:nth-child(2) {
 		width: 10%;
 	}
 
-	#assignKpi_accordion table.tableGridLv td:nth-child(3) {
+	#assignKpi table.tableGridLv td:nth-child(3) {
 		width: 40%
 	}
 
-	#assignKpi_accordion table.tableGridLv td:nth-child(4) {
+	#assignKpi table.tableGridLv td:nth-child(4) {
 		width: 10%;
 	}
 
-	#assignKpi_accordion table.tableGridLv td:nth-child(5) {
+	#assignKpi table.tableGridLv td:nth-child(5) {
 		width: 10%;
 	}
 
-	#assignKpi_accordion table.tableGridLv td:nth-child(6) {
+	#assignKpi table.tableGridLv td:nth-child(6) {
 		width: 10%;
 	}
 
-	#assignKpi_accordion table.tableGridLv td:nth-child(7) {
+	#assignKpi table.tableGridLv td:nth-child(7) {
 		width: 10%;
 		padding: 0px;
 	}   
-	#assignKpi_accordion table.tableGridLv td:nth-child(8) {
+	#assignKpi table.tableGridLv td:nth-child(8) {
 		width: 10%;
 	} 
-	#assignKpi_accordion table.tableGridLv td:nth-child(7) input{
+	#assignKpi table.tableGridLv td:nth-child(7) input{
 		border-width: 0px 0px 1px 0px;
 		background-color: transparent;
 	}  
@@ -649,8 +649,8 @@
 			<form:input type="hidden" id="orgId" path="orgId" />
 		</form:form>
 
-		<div id="assignKpi_accordion" class="">
-		<c:if test="${not empty accordions}">
+		<div id="assignKpi">
+		<c:if test="${not empty resultKpis}">
 			<div class="table-responsive">
 				<table class="tableGridLv hoverTable">
 					<thead>
@@ -668,8 +668,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<c:forEach items="${accordions}" var="accordion" varStatus="acLoop">
-						<c:forEach items="${accordion.resultKpis}" var="kpi" varStatus="loop">
+						<c:forEach items="${resultKpis}" var="kpi" varStatus="loop">
 							<tr id="r${kpi.kpiId}">
 								<td style="display: none;">${kpi.kpiId}</td>
 								<td style="text-align: center">
@@ -694,9 +693,7 @@
 											</c:otherwise>
 										</c:choose>
 									</c:otherwise>
-								</c:choose>
-
-									
+								</c:choose>									
 								</td>
 								<td>${chandraFn:nl2br(kpi.kpiName)}</td>
 								<td class="center">${chandraFn:nl2br(kpi.calendarTypeName)}</td>
@@ -731,81 +728,12 @@
 								</td>
 							</tr>
 						</c:forEach>
-						</c:forEach>
 					</tbody>
 				</table>
 			</div>
 		</c:if>
 		</div>
-		<%-- <!-- <div id="assignKpi_accordion" class="">
-			<c:if test="${not empty accordions}">
-				<c:forEach items="${accordions}" var="accordion" varStatus="acLoop">
-					<h3>${accordion.structureName}</h3>
-					<div class="table-responsive">
-						<table class="tableGridLv hoverTable">
-							<thead>
-								<tr>
-									<th style="display: none;">รหัสตัวบ่งชี้</th>
-									<th style="text-align: center">เลือกตัวบ่งชี้</th>
-									<th>กลุ่มตัวบ่งชี้</td>
-									<th>ชื่อตัวบ่งชี้</td>
-									<th>ประเภทปฏิทิน</td>
-									<th class="center">ช่วงเวลา</th>
-									<th class="center">หน่วยวัด</th>
-									<th class="center">เป้าหมาย</th>
-								</tr>
-							</thead>
-							<tbody>
-								<c:forEach items="${accordion.resultKpis}" var="kpi"
-									varStatus="loop">
-									<tr id="r${kpi.kpiId}">
-										<td style="display: none;">${kpi.kpiId}</td>
-										<td style="text-align: center"><c:choose>
-												<c:when test="${kpi.resultId>0}">
-													<input type="checkbox" name="isUsed" value="1" checked>
-												</c:when>
-												<c:otherwise>
-													<input type="checkbox" name="isUsed" value="1">
-												</c:otherwise>
-											</c:choose></td>
-										<td>${chandraFn:nl2br(kpi.kpiGroupShortName)}</td>
-										<td>${chandraFn:nl2br(kpi.kpiName)}</td>
-										<td>${chandraFn:nl2br(kpi.calendarTypeName)}</td>
-										<td class="center">${chandraFn:nl2br(kpi.periodName)}</td>
-										<td class="center">${chandraFn:nl2br(kpi.kpiUomName)}</td>
-										<td class="center"><c:choose>
-												<c:when test="${kpi.resultId>0}">												
-													<c:choose>
-														<c:when test="${not empty kpi.targetValue && kpi.targetValue > 0}">
-															<a href="#" class="icon" onClick="actTarget(this)">
-																<img src="<c:url value="/resources/images/edited-assign.png"/>" width="25" height="25">
-															</a>
-														</c:when>
-														<c:otherwise>
-															<a href="#" class="icon" onClick="actTarget(this)">
-																<img src="<c:url value="/resources/images/edited.png"/>" width="25" height="25">
-															</a>
-														</c:otherwise>
-													</c:choose>
 
-												</c:when>
-												<c:otherwise>
-													<a href="#" class="icon" onClick="actTarget(this)"
-														style="display: none">
-														<img src="<c:url value="/resources/images/edited.png"/>" width="22" height="22">
-													</a>
-												</c:otherwise>
-											</c:choose></td>
-									</tr>
-								</c:forEach>
-							</tbody>
-						</table>
-					</div>
-					<!-- end 1 accordion -->
-
-				</c:forEach>
-			</c:if>
-		</div> --> --%>
 		<div style="text-align:center;padding:25px 10px 25px 10px;">		
 			<input type="button" class="btn btn-success" onclick="beforeInsertResult()" value="บันทึก" style="margin-right:10px"/>
 			<input type="button" class="btn btn-inverse" onclick="reloadResult()" value="กลับสู่ค่าเริ่มต้น"> 

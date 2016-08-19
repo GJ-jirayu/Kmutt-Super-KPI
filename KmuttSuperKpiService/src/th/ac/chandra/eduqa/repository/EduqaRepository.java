@@ -516,7 +516,7 @@ public class EduqaRepository   {
 		Query query = entityManager.createQuery(
 				" select p from KpiUom p " + sb.toString(), KpiUom.class);
 		query.setFirstResult((pagging.getPageNo() - 1) * pagging.getPageSize());
-		//query.setMaxResults(pagging.getPageSize());
+		query.setMaxResults(pagging.getPageSize());
 		transList.add(query.getResultList());
 		query = entityManager.createQuery("select count(p) from KpiUom p "
 				+ sb.toString());
@@ -2299,12 +2299,10 @@ public class EduqaRepository   {
 					+ " left join kpi_group grp on kpi.kpi_group_id = grp.kpi_group_id" 
 					+ " 	and kpi.academic_year = grp.academic_year"  
 					+ " left join calendar_type ct on kpi.calendar_type_id = ct.calendar_type_id"  
-					+ " left join period p on kpi.period_id = p.period_id"  
-					+ " left join kpi_uom uom on kpi.kpi_uom_id = uom.kpi_uom_id"  
-					+ " 	and kpi.academic_year = uom.academic_year" 
+					+ " left join period p on kpi.period_id = p.period_id"
+					+ " left join kpi_uom uom on kpi.kpi_uom_id = uom.kpi_uom_id"
 					+ " left join kpi_perspective kp on kp.kpi_perspective_id = kpi.kpi_perspective_id" 
 					+ " order by kpi.kpi_code";
-			
 			Query query = entityManager.createNativeQuery(sql);
 			if(query.getResultList().size()>0){
 				List<Object[]> results = query.getResultList();
@@ -2317,9 +2315,8 @@ public class EduqaRepository   {
 					km.setKpiGroupShortName( (String)result[4]);
 					km.setCalendarTypeName( (String)result[5]);
 					km.setPeriodName( (String)result[6] );
-					km.setKpiUomName(  (String)result[7] );
-					km.setResultId(Integer.parseInt(result[8].toString())); //km.setResultId(  ((BigInteger)result[8]).intValue() );  //  mean flag active field 
-				//	km.setResultId(  (Integer)result[8] );  //  mean flag active field 
+					km.setKpiUomName( (String)result[7]);
+					km.setResultId(Integer.parseInt(result[8].toString()));
 					km.setTargetValue( (result[9] != null ? Double.parseDouble(result[9].toString()) : null) );
 					km.setKpiPerspectiveId((Integer)result[10]);
 					km.setKpiPerspectiveName((String)result[11]);

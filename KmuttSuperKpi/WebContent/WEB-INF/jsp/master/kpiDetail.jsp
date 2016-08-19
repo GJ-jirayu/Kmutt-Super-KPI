@@ -1540,7 +1540,7 @@
 				</tr>
 				<tr>
 					<td>
-						<label>ประเภทปฏิทิน</label><form:select id="detailCalendarType"  path="kpiModel.calendarTypeId" items="${calendarTypeList}" /></td>
+						<label>ประเภทปี</label><form:select id="detailCalendarType"  path="kpiModel.calendarTypeId" items="${calendarTypeList}" /></td>
 					<td> 
 						<label>ช่วงเวลา </label> <form:select id="detailPeriod"  path="kpiModel.periodId" items="${periodList}" class="Required"/> 
 					</td>
@@ -1635,7 +1635,7 @@
 
 		<div id="accordionStateMessage" style="{text-align:center;color:red}"> <!-- Generate by Javascript --></div>
 		<div id="accordion" class="eduqa-kpi-calc">
-			<h3>เกณฑ์มาตราฐาน/เกณฑ์ประเมิน</h3>
+			<h3>เกณฑ์มาตรฐาน/เกณฑ์ประเมิน</h3>
 			<div class="kpi-criteria">
 				<form:form  id="kpiFormCriteria" modelAttribute="kpiForm" method="post"  name="kpiForm" action="{formActionNew}" enctype="multipart/form-data">
 					<table class="tableKpiCriteria2"> 

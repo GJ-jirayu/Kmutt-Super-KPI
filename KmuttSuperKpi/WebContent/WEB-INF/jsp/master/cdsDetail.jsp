@@ -531,7 +531,7 @@
 									<td><form:textarea path="cdsModel.cdsDesc" cols="70" rows="2"></form:textarea></td>
 								</tr>
 								<tr><td></td><td></td></tr>
-								<tr>
+								<tr style="display: none;">
 									<td>รหัสข้อมูลพื้นฐาน che :</td>
 									<td><form:input type="text" class="tinyText" path="cdsModel.cheCode" readonly="true"/></td>
 								</tr>

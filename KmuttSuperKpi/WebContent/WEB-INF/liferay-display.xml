@@ -3,7 +3,7 @@
 
 <display>
 	<category name="KPI Management">
-		<portlet id="KpiLevel"></portlet>
+		<!-- <portlet id="KpiLevel"></portlet> -->
 		<portlet id="KpiGroup"></portlet>
 		<portlet id="KpiGroupType"></portlet>
 		<portlet id="KpiType"></portlet>

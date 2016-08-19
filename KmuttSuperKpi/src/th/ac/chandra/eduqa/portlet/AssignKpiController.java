@@ -128,8 +128,9 @@ public class AssignKpiController {
 		resultModel.setKpiGroupId(0); //Get Default value
 		resultModel.setKpiPerspectiveId(0); //Get Default value
 		List<KpiResultModel> resultKpis = service.searchKpiResultWithActiveKpi(resultModel);
-		List<KpiListForm> lists = convertAccordion(resultKpis);
-		model.addAttribute("accordions",lists);
+		//List<KpiListForm> lists = convertAccordion(resultKpis);
+		//model.addAttribute("accordions",resultKpis);
+		model.addAttribute("resultKpis",resultKpis);
 		model.addAttribute("lastPage",service.getResultPage());
 		
 		// list value for select tag //
@@ -222,7 +223,8 @@ public class AssignKpiController {
 		resultModel.setKpiPerspectiveId(paramPerspectiveId);
 		List<KpiResultModel> resultKpis = service.searchKpiResultWithActiveKpi(resultModel);
 		List<KpiListForm> lists = convertAccordion(resultKpis);
-		model.addAttribute("accordions",lists);
+		//model.addAttribute("accordions",lists);
+		model.addAttribute("accordions",resultKpis);
 		model.addAttribute("lastPage",service.getResultPage());
 		
 		// list from iniPage ชั่วคราว

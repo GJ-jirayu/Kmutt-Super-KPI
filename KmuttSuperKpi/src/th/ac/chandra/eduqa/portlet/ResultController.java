@@ -84,8 +84,7 @@ public class ResultController {
 	@Qualifier("eduqaServiceWSImpl")
 	private EduqaService service;
 	private String uploadDirectory = "/home/portal/super-kpi/file-upload";
-	//private String uploadDirectory = "/home/gj-app-dev/kmutt/super-kpi/file-upload";
-	//private String uploadDirectory = "/home/ittishat/app/super-kpi/file-upload";
+	//private String uploadDirectory = "/home/pwirun/app/super-kpi/file-upload";
 	private String directoryDelimitor;
 
 	private Integer tempGroupOptValue = 0;
